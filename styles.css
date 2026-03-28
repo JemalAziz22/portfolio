@@ -621,6 +621,7 @@ body {
     font-family: 'JetBrains Mono', monospace;
     font-size: 0.9rem;
     line-height: 1.6;
+    overflow-x: auto;
 }
 
 .code-keyword {
@@ -1287,8 +1288,12 @@ section {
     }
 
     .code-window {
-        max-width: 500px;
+        max-width: 100%;
         margin: 0 auto;
+    }
+    
+    .skills-grid, .projects-grid, .testimonials-grid, .blog-grid {
+        grid-template-columns: 1fr;
     }
 }
 
@@ -1327,8 +1332,10 @@ section {
     }
 
     .controls-wrapper {
-        top: 1rem;
-        right: 1rem;
+        top: auto;
+        bottom: 1.5rem;
+        right: 1.5rem;
+        flex-direction: column;
     }
 
     .theme-toggle,
@@ -1345,10 +1352,6 @@ section {
 
     .name-gradient {
         font-size: 2.5rem;
-    }
-    
-    .skills-grid, .projects-grid, .testimonials-grid, .blog-grid {
-        grid-template-columns: 1fr;
     }
     
     .hero {
@@ -1402,5 +1405,10 @@ section {
     .arabic-layout .nav-link {
         text-align: right;
         display: block;
+    }
+    
+    .arabic-layout .controls-wrapper {
+        right: auto;
+        left: 1.5rem;
     }
 }
