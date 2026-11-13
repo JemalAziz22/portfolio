@@ -1,104 +1,55 @@
-# Azad's Portfolio Website 🚀
+# Systems Engineer & Android Developer Portfolio
 
-A stunning, modern portfolio website showcasing skills as a Computer Systems Engineering student and Android Kotlin Developer. Built with cutting-edge design principles including neumorphism, glassmorphism, and advanced animations.
+A static, single-page portfolio built with semantic HTML, CSS, and vanilla JavaScript. No framework, package manager, or build step is required.
 
-## ✨ Features
+## Project structure
 
-### 🎨 Visual Design
-- **Dual Theme Support**: Seamless dark/light mode toggle with persistent preference and adaptive color palettes
-- **Neumorphism UI**: Soft, extruded design elements for cards and buttons
-- **Glassmorphism Effects**: Frosted glass aesthetic with backdrop blur on project cards and code windows
-- **3D Transformations**: Perspective-based hover effects on project cards with tilt animations
-- **Animated SVG Backgrounds**: Dynamic wave animations that respond to user interaction
-- **Vibrant Gradients**: Eye-catching color schemes with smooth transitions throughout
-- **Custom Favicon**: Animated logo with gradient styling
-
-### ✨ Interactive Elements
-- **Smooth Scrolling**: Elegant navigation between sections with active link highlighting
-- **Enhanced Typing Animation**: Dynamic hero subtitle cycling through 5 roles including 'Tech Innovator' and 'UI/UX Enthusiast'
-- **Animated Skill Progress Bars**: Visual skill meters with shimmer effects that animate on scroll
-- **Project Filtering**: Interactive filter buttons to sort projects by category (All, Android, Systems, Web)
-- **Hover Animations**: Advanced 3D card interactions with mouse-tracking tilt effects
-- **Parallax Scrolling**: Multi-layer depth effects in hero section with floating code elements
-- **Animated Gradient Orbs**: Floating background elements that respond to mouse movement
-- **Scroll-Triggered Animations**: Elements fade in with staggered timing as you scroll
-- **Floating Code Icons**: Animated symbols ({ }, </>, ⚡) around the code window
-
-### 🎯 Advanced Features
-- **Animated Logo**: SVG logo with draw animation and pulse effect
-- **Interactive Code Window**: 3D-transformed code snippet with glassmorphism and syntax highlighting
-- **Project Stats**: GitHub-style star and fork counts on project cards
-- **Lazy Loading**: Optimized image loading for better performance
-- **Enhanced Card Interactions**: Mouse-tracking 3D tilt effects on hover
-- **Performance Optimized**: Debounced scroll handlers and efficient animations
-
-### 📱 Sections
-1. **Hero**: Eye-catching introduction with 3D animated code window and floating elements
-2. **About Me**: Personal background and passion for technology
-3. **Skills**: Neumorphic cards with animated progress bars showing proficiency levels
-4. **Projects**: Filterable gallery with glassmorphic cards, live stats, and hover previews
-5. **Testimonials**: Professional recommendations with glassmorphism design
-6. **Blog**: Thought leadership and technical articles
-7. **Contact**: Easy ways to get in touch with gradient CTA buttons
-
-## Technologies Used
-
-- **HTML5**: Semantic markup
-- **CSS3**: Custom properties, Grid, Flexbox, animations
-- **JavaScript**: Vanilla JS for interactivity
-- **Google Fonts**: Inter & JetBrains Mono
-
-## Getting Started
-
-1. Open `index.html` in your web browser
-2. No build process required - pure HTML, CSS, and JavaScript!
-
-## Customization
-
-### Colors
-Edit CSS variables in `styles.css`:
-```css
-:root {
-    --accent-primary: #667eea;
-    --accent-secondary: #764ba2;
-    /* Add your custom colors */
-}
+```text
+assets/
+  favicon.svg
+css/
+  styles.css
+  tokens.css
+data/
+  data.js
+js/
+  app.js
+index.html
 ```
 
-### Content
-- Update personal information in `index.html`
-- Add your own projects, skills, and blog posts
-- Replace placeholder links with your actual social media profiles
+## Local preview
 
-### Theme
-The theme preference is automatically saved to localStorage and persists across sessions.
+Open `index.html` in a browser, or serve the project directory with any static file server. Serving over HTTP is recommended so browser storage and external API behavior match deployment.
 
-## Browser Support
+## Editing content
 
-- Chrome (latest)
-- Firefox (latest)
-- Safari (latest)
-- Edge (latest)
+Edit `data/data.js`; the HTML structure and CSS do not need content changes.
 
-## Performance
+- Replace profile name and location in `locales.en.status` and `locales.ar.status`.
+- Update the hero, about, skills, projects, contact copy, and footer in both locale objects.
+- Edit `hero.terminal.steps` and `hero.terminal.logLevels` for the terminal demo. Update `hero.monitor.seed` and `about.activitySeed` to change the simulated system readings and activity heatmap; these are illustrative, not live device telemetry.
+- Update the hero and about `metrics` values with verified counts before publishing. The displayed project count and years are placeholders.
+- Add projects to each locale's `projects.items`. To load live GitHub stars and forks, set `repository` to `owner/repository`. If the request fails or the field is empty, the project's `fallbackStats` are shown.
+- Project links are omitted when `codeUrl` and `liveUrl` are empty.
+- To add another language, add its name to `localeNames` and a complete locale object with a `direction` (`ltr` or `rtl`) and the same content fields. The language switch cycles through the locale keys.
+- Replace `settings.web3FormsAccessKey` with the access key from your Web3Forms dashboard. The contact button stays disabled while the placeholder key is present. The key is used in the browser, as required by Web3Forms; do not put private server credentials here.
 
-- Optimized animations with CSS transforms
-- Debounced scroll handlers
-- Intersection Observer for efficient scroll animations
-- Minimal JavaScript for fast load times
+## Design and preferences
 
-## Future Enhancements
+Change color, typography, spacing, and responsive grid tokens in `css/tokens.css`. The theme toggle follows the operating-system preference until a visitor chooses a theme, then stores that choice in `localStorage`.
 
-- Add actual blog functionality
-- Integrate with GitHub API for live project data
-- Add contact form with backend integration
-- Implement project filtering by technology
-- Add more interactive code examples
+## Deployment
 
-## License
+### GitHub Pages
 
-Feel free to use this template for your own portfolio! Just remember to customize it with your own content and personality.
+1. Push the project to a GitHub repository.
+2. In **Settings → Pages**, choose the desired branch and the repository root as the source.
+3. Wait for the Pages deployment, then open the published URL.
 
----
+### Netlify
 
-**Built with passion by Azad** 🚀
+1. Import the repository or deploy the project folder.
+2. Set the publish directory to the project root.
+3. Leave the build command empty.
+
+After deployment, verify the form using a configured Web3Forms key and replace all sample portfolio details and placeholder links.
