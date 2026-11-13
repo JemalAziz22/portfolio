@@ -2,6 +2,63 @@ const data = window.PORTFOLIO_DATA;
 const storedLocale = localStorage.getItem("portfolio-locale");
 const locale = data.locales[storedLocale] ? storedLocale : data.defaultLocale;
 const content = data.locales[locale];
+const activityLog = [];
+const maxLogEntries = 50;
+let logcatOutput = null;
+let logLevelFilter = "ALL";
+
+function localizeMessage(template, values = {}) {
+  return template.replace(/\{(\w+)\}/g, (_, key) => values[key] ?? "");
+}
+
+function recordActivity(level, key, values = {}) {
+  const template = content.hero.terminal.text[key];
+  if (!template) return;
+
+  activityLog.push({
+    level,
+    message: localizeMessage(template, values),
+    timestamp: new Date(),
+  });
+  if (activityLog.length > maxLogEntries) activityLog.shift();
+  renderLogcat();
+}
+
+function renderLogcat() {
+  if (!logcatOutput) return;
+  const entries = activityLog.filter(
+    (entry) => logLevelFilter === "ALL" || entry.level === logLevelFilter,
+  );
+  logcatOutput.replaceChildren();
+
+  entries.forEach((entry) => {
+    const line = document.createElement("p");
+    line.className = `terminal-log log-level-${entry.level.toLowerCase()}`;
+    const time = document.createElement("time");
+    time.dateTime = entry.timestamp.toISOString();
+    time.textContent = new Intl.DateTimeFormat(locale, {
+      hour: "2-digit",
+      minute: "2-digit",
+      second: "2-digit",
+    }).format(entry.timestamp);
+    const level = document.createElement("span");
+    level.className = "log-level";
+    level.textContent = entry.level;
+    const message = document.createElement("span");
+    message.textContent = entry.message;
+    line.append(time, level, message);
+    logcatOutput.append(line);
+  });
+}
+
+const pendingLanguage = sessionStorage.getItem("portfolio-pending-language");
+if (pendingLanguage) {
+  sessionStorage.removeItem("portfolio-pending-language");
+  recordActivity("I", "languageEvent", {
+    language: data.localeNames[locale] || locale,
+  });
+}
+recordActivity("I", "pageLoaded");
 
 document.documentElement.lang = locale;
 document.documentElement.dir = content.direction;
@@ -45,6 +102,7 @@ localeToggle.querySelector('[data-slot="locale-label"]').textContent =
 localeToggle.setAttribute("aria-label", content.controls.languageLabel);
 localeToggle.setAttribute("aria-pressed", String(locale !== data.defaultLocale));
 localeToggle.addEventListener("click", () => {
+  sessionStorage.setItem("portfolio-pending-language", nextLocale);
   localStorage.setItem("portfolio-locale", nextLocale);
   window.location.reload();
 });
@@ -74,9 +132,10 @@ function applyTheme(theme) {
 
 applyTheme(savedTheme || systemTheme);
 
-themeToggle.addEventListener("click", () => {
-  const nextTheme =
-    document.documentElement.dataset.theme === "light" ? "dark" : "light";
+function changeTheme(nextTheme) {
+  if (!["dark", "light"].includes(nextTheme)) return false;
+  if (document.documentElement.dataset.theme === nextTheme) return true;
+
   const switchTheme = () => {
     localStorage.setItem("portfolio-theme", nextTheme);
     applyTheme(nextTheme);
@@ -89,11 +148,22 @@ themeToggle.addEventListener("click", () => {
   } else {
     switchTheme();
   }
+  recordActivity("I", "themeEvent", { theme: nextTheme });
+  return true;
+}
+
+themeToggle.addEventListener("click", () => {
+  const nextTheme =
+    document.documentElement.dataset.theme === "light" ? "dark" : "light";
+  changeTheme(nextTheme);
 });
 
 if (!savedTheme) {
   window.matchMedia("(prefers-color-scheme: light)").addEventListener("change", (event) => {
     applyTheme(event.matches ? "light" : "dark");
+    recordActivity("I", "themeEvent", {
+      theme: event.matches ? "light" : "dark",
+    });
   });
 }
 
@@ -103,6 +173,7 @@ const slots = {
   location: content.status.location,
   "time-label": content.status.localTimeLabel,
   availability: content.status.available,
+  "availability-sample": content.status.availabilitySampleLabel,
   "uptime-label": content.live.uptimeLabel,
 };
 
@@ -150,6 +221,7 @@ favicon.href = `data:image/svg+xml,${encodeURIComponent(faviconSvg)}`;
 
 document.querySelector('[data-slot="hero-copy"]').innerHTML = `
   <p class="hero-eyebrow">${content.hero.eyebrow}</p>
+  <span class="hero-sample-label">${content.hero.sampleLabel}</span>
   <h1 class="hero-title" id="hero-title">${content.hero.titleParts
     .map((part) => `<span${part.accent ? ' class="title-accent"' : ""}>${part.text}</span>`)
     .join("")}<span class="terminal-cursor" aria-hidden="true">_</span></h1>
@@ -164,7 +236,7 @@ document.querySelector('[data-slot="hero-copy"]').innerHTML = `
         (metric) => `
           <div class="hero-metric">
             <span class="hero-metric-value counter-value" data-count-target="${metric.value}" data-count-suffix="${metric.suffix}" aria-hidden="true">0${metric.suffix}</span>
-            <span class="hero-metric-label">${metric.label}</span>
+            <span class="hero-metric-label">${content.hero.metricSampleLabel} · ${metric.label}</span>
           </div>
         `,
       )
@@ -193,6 +265,63 @@ document.querySelector('[data-slot="hero-spec"]').innerHTML = `
 document
   .querySelector('[data-slot="hero-spec"]')
   .setAttribute("aria-label", content.hero.specLabel);
+
+const profileImage = data.profileImage;
+const profileImageMarkup = profileImage.enabled
+  ? `<img
+        src="${profileImage.src}"
+        srcset="${profileImage.srcSet}"
+        sizes="(max-width: 767px) 88px, 144px"
+        width="${profileImage.width}"
+        height="${profileImage.height}"
+        fetchpriority="high"
+        alt="${content.hero.identity.imageAlt}"
+        style="--profile-image-position:${profileImage.position}"
+      >`
+  : "";
+const profilePhoto = document.createElement("figure");
+profilePhoto.className = "profile-photo";
+profilePhoto.tabIndex = 0;
+profilePhoto.setAttribute("aria-label", content.hero.identity.imageAlt);
+profilePhoto.innerHTML = `
+  ${profileImageMarkup}
+  <span class="profile-monogram" aria-hidden="true">${monogram}</span>
+  <span class="profile-photo-mark profile-photo-mark--top-start" aria-hidden="true">+</span>
+  <span class="profile-photo-mark profile-photo-mark--top-end" aria-hidden="true">+</span>
+  <span class="profile-photo-mark profile-photo-mark--bottom-start" aria-hidden="true">+</span>
+  <span class="profile-photo-mark profile-photo-mark--bottom-end" aria-hidden="true">+</span>
+`;
+const profileImageElement = profilePhoto.querySelector("img");
+if (profileImageElement) {
+  profileImageElement.addEventListener("load", () => {
+    profilePhoto.classList.add("has-image");
+  });
+  profileImageElement.addEventListener("error", () => {
+    profileImageElement.remove();
+  });
+}
+document.querySelector('[data-slot="hero-spec"]').insertAdjacentHTML(
+  "afterbegin",
+  `
+    <section class="profile-identity" aria-label="${content.hero.specLabel}">
+      <div class="profile-portrait"></div>
+      <div class="profile-identity-copy">
+        <p class="profile-name">${content.status.name}</p>
+        <p class="profile-role">${content.hero.identity.role}</p>
+        <p class="profile-location">${content.status.location}</p>
+        <p class="profile-availability">
+          <span class="availability-indicator" aria-hidden="true"></span>
+          <span>${content.status.available}</span>
+        </p>
+        <div class="profile-metadata">
+          <span class="profile-sample-label">${content.hero.identity.sampleLabel}</span>
+          <span class="profile-id">ID ${content.hero.identity.id}</span>
+        </div>
+      </div>
+    </section>
+  `,
+);
+document.querySelector(".profile-portrait").append(profilePhoto);
 
 const architectureRows = content.hero.architecture;
 const architectureBoxes = architectureRows
@@ -230,234 +359,627 @@ document.querySelector('[data-slot="hero-spec"]').insertAdjacentHTML(
 );
 
 const terminal = content.hero.terminal;
-const terminalAccessibleText = terminal.steps
-  .map((step) => `${terminal.prompt} ${step.command}\n${step.output}`)
-  .join("\n");
-document.querySelector('[data-slot="hero-spec"]').insertAdjacentHTML(
-  "afterbegin",
-  `
-    <div class="terminal-block">
-      <div class="terminal-titlebar">
-        <span class="window-indicators" aria-hidden="true"><i></i><i></i><i></i></span>
-        <p class="terminal-heading">
-          <svg class="icon" aria-hidden="true"><use href="assets/icons.svg#terminal"></use></svg>
-          <span>${terminal.windowTitle}</span>
-        </p>
-        <span class="terminal-live-indicator" aria-hidden="true"></span>
-      </div>
-      <div class="terminal-tabs" aria-hidden="true">
-        ${terminal.tabs.map((tab, index) => `<span${index === 0 ? ' class="is-selected"' : ""}>${tab}</span>`).join("")}
-      </div>
-      <div class="terminal-screen" aria-hidden="true">
-        <div class="terminal-output"></div>
-        <span class="terminal-cursor">_</span>
-      </div>
-      <p class="sr-only">${terminal.accessibleLabel}: ${terminalAccessibleText}</p>
-    </div>
-  `,
-);
-
 const monitor = content.hero.monitor;
 const now = content.hero.now;
-document.querySelector(".terminal-block").insertAdjacentHTML(
-  "afterend",
-  `
-    <section class="system-monitor" aria-label="${monitor.title}">
-      <div class="monitor-heading">
-        <span>${monitor.title}</span>
-        <span class="monitor-updated"><i aria-hidden="true"></i>${monitor.liveLabel}</span>
+const reduceMotionQuery = window.matchMedia(
+  "(prefers-reduced-motion: reduce)",
+);
+const terminalHistory = [];
+let historyCursor = 0;
+let monitorActive = false;
+let monitorViewportVisible = false;
+let monitorFrame = 0;
+let monitorSampleTimestamp = 0;
+let monitorSampleCount = 0;
+let monitorValues = { fps: [], memory: [], network: [] };
+
+const monitorPanelMarkup = `
+  <section class="system-monitor" id="monitor-panel" role="tabpanel" tabindex="0" aria-labelledby="tab-monitor" aria-label="${monitor.title}" hidden>
+    <div class="monitor-heading">
+      <span>${monitor.title}</span>
+      <span class="monitor-updated">${monitor.liveLabel}</span>
+    </div>
+    <div class="monitor-grid">
+      ${["fps", "memory", "network"]
+        .map(
+          (key) => `
+            <div class="monitor-metric" data-monitor="${key}">
+              <span class="monitor-label">${monitor.labels[key]}</span>
+              <svg class="sparkline" viewBox="0 0 120 40" role="img" aria-label="${monitor.labels[key]}">
+                <path class="sparkline-line" fill="none"></path>
+              </svg>
+              <span class="monitor-reading"><b data-reading>n/a</b><small data-unit>${monitor.units[key]}</small></span>
+              <span class="monitor-detail" data-monitor-detail></span>
+            </div>
+          `,
+        )
+        .join("")}
+    </div>
+  </section>
+`;
+
+const logcatFilters = ["ALL", "I", "D", "W", "E"];
+const terminalMarkup = `
+  <div class="terminal-block">
+    <div class="terminal-titlebar">
+      <span class="window-indicators" aria-hidden="true"><i></i><i></i><i></i></span>
+      <p class="terminal-heading">
+        <svg class="icon" aria-hidden="true"><use href="assets/icons.svg#terminal"></use></svg>
+        <span>${terminal.windowTitle}</span>
+      </p>
+      <span class="terminal-live-indicator" aria-hidden="true"></span>
+    </div>
+    <div class="terminal-tabs" role="tablist" aria-label="${terminal.label}">
+      ${Object.entries(terminal.tabs)
+        .map(
+          ([key, label], index) => `
+            <button
+              id="tab-${key}"
+              type="button"
+              role="tab"
+              aria-selected="${index === 0}"
+              aria-controls="${key}-panel"
+              tabindex="${index === 0 ? "0" : "-1"}"
+              data-terminal-tab="${key}"
+            >${label}</button>
+          `,
+        )
+        .join("")}
+    </div>
+    <section class="terminal-panel" id="console-panel" role="tabpanel" tabindex="0" aria-labelledby="tab-console">
+      <div class="terminal-screen">
+        <div class="terminal-output" role="log" aria-live="off" aria-relevant="additions text"></div>
       </div>
-      <div class="monitor-grid">
-        ${["cpu", "memory", "network"]
+      <form class="terminal-input-form">
+        <label class="sr-only" for="terminal-command">${terminal.inputLabel}</label>
+        <span class="terminal-prompt" aria-hidden="true">${terminal.prompt}</span>
+        <input id="terminal-command" name="command" type="text" autocomplete="off" spellcheck="false" aria-label="${terminal.inputLabel}" placeholder="${terminal.inputPlaceholder}">
+        <button type="submit">${terminal.runLabel}</button>
+      </form>
+      <div class="terminal-quick-commands" role="group" aria-label="${terminal.quickCommandsLabel}">
+        ${terminal.quickCommands
           .map(
-            (key) => `
-              <div class="monitor-metric" data-monitor="${key}">
-                <span class="monitor-label">${monitor.labels[key]}</span>
-                <svg class="sparkline" viewBox="0 0 120 40" role="img" aria-label="${monitor.labels[key]}">
-                  <defs>
-                    <linearGradient id="area-${key}" x1="0" x2="0" y1="0" y2="1">
-                      <stop offset="0%" stop-color="var(--metric-color)" stop-opacity=".24"></stop>
-                      <stop offset="100%" stop-color="var(--metric-color)" stop-opacity="0"></stop>
-                    </linearGradient>
-                  </defs>
-                  <path class="sparkline-area" fill="url(#area-${key})"></path>
-                  <path class="sparkline-line" stroke="var(--metric-color)"></path>
-                </svg>
-                <span class="monitor-reading"><b data-reading>--</b><small>${monitor.units[key]}</small></span>
-              </div>
-            `,
+            (command) =>
+              `<button type="button" class="terminal-chip" data-command="${command}">${command}</button>`,
           )
           .join("")}
       </div>
+      <p class="terminal-command-live sr-only" aria-live="polite" aria-atomic="true"></p>
     </section>
-    <aside class="now-panel">
+    ${monitorPanelMarkup}
+    <section class="logcat-panel" id="logcat-panel" role="tabpanel" tabindex="0" aria-labelledby="tab-logcat" hidden>
+      <div class="logcat-controls">
+        <div class="logcat-filters" role="group" aria-label="${terminal.text.logFilter}">
+          ${logcatFilters
+            .map(
+              (level) => `
+                <button type="button" data-log-filter="${level}" aria-pressed="${level === "ALL"}" aria-label="${terminal.text.logLevels[level]}">${level === "ALL" ? terminal.text.allLevels : level}</button>
+              `,
+            )
+            .join("")}
+        </div>
+        <button type="button" class="logcat-clear">${terminal.text.logClear}</button>
+      </div>
+      <div class="logcat-screen" role="log" aria-live="off" aria-relevant="additions text"></div>
+    </section>
+  </div>
+`;
+
+document.querySelector(".profile-identity").insertAdjacentHTML(
+  "afterend",
+  terminalMarkup,
+);
+document.querySelector(".terminal-block").insertAdjacentHTML(
+  "afterend",
+  `
+    <aside class="now-panel" aria-label="${now.label}">
       <div class="now-heading">
         <span class="now-label">${now.label}</span>
-        <span class="now-status"><i aria-hidden="true"></i>${now.status}</span>
+        <span class="now-status"><i aria-hidden="true"></i><span data-now-status>${now.status}</span></span>
       </div>
-      <p class="now-title">${now.title}</p>
-      <p class="now-updated">${now.updated}</p>
+      <p class="now-title" data-now-title>${now.loading}</p>
+      <p class="now-message" data-now-message></p>
+      <p class="now-updated" data-now-updated></p>
     </aside>
   `,
 );
 
-function completeTerminal() {
-  terminalRunId += 1;
-  const terminalOutput = document.querySelector(".terminal-output");
-  terminalOutput.replaceChildren();
+const terminalOutput = document.querySelector(".terminal-output");
+const terminalScreen = document.querySelector(".terminal-screen");
+const terminalInput = document.querySelector("#terminal-command");
+const terminalLive = document.querySelector(".terminal-command-live");
+const monitorCharts = [...document.querySelectorAll(".monitor-metric")];
+logcatOutput = document.querySelector(".logcat-screen");
+renderLogcat();
 
-  terminal.steps.forEach((step) => {
-    const command = document.createElement("p");
-    command.className = "terminal-command";
-    command.textContent = `${terminal.prompt} ${step.command}`;
-    formatTerminalCommand(command, step.command);
-    terminalOutput.append(command);
-
-    const output = document.createElement("p");
-    output.className = "terminal-result";
-    output.textContent = step.output;
-    terminalOutput.append(output);
-  });
-
-  terminal.logLevels.slice(0, 2).forEach((entry, index) => {
-    appendLogLine(entry, index);
+function scrollConsoleToEnd() {
+  window.requestAnimationFrame(() => {
+    terminalScreen.scrollTop = terminalScreen.scrollHeight;
   });
 }
 
-let terminalRunId = 0;
-let logcatTimer = 0;
-let logcatIndex = 0;
-let terminalTypingFinished = false;
-let terminalVisible = true;
+function appendConsoleLine(text, className = "terminal-result") {
+  const line = document.createElement("p");
+  line.className = className;
+  line.textContent = text;
+  terminalOutput.append(line);
+  while (terminalOutput.children.length > 200) {
+    terminalOutput.firstElementChild.remove();
+  }
+  scrollConsoleToEnd();
+}
 
-function formatTerminalCommand(line, commandText) {
+function appendCommandEcho(commandText) {
+  const line = document.createElement("p");
+  line.className = "terminal-command";
   const prompt = document.createElement("span");
   prompt.className = "terminal-prompt";
   prompt.textContent = terminal.prompt;
-  line.replaceChildren(prompt, document.createTextNode(" "));
+  const commandName = document.createElement("span");
+  commandName.className = "terminal-command-name";
+  commandName.textContent = commandText.split(/\s+/)[0] || "";
+  line.append(prompt, document.createTextNode(" "), commandName);
 
-  const [commandName, ...tokens] = commandText.match(/'[^']*'|"[^"]*"|\S+/g) || [];
-  if (commandName) {
-    const command = document.createElement("span");
-    command.className = "terminal-command-name";
-    command.textContent = commandName;
-    line.append(command);
-  }
-
-  tokens.forEach((token) => {
+  const tokens = commandText.match(/"[^"]*"|'[^']*'|\S+/g) || [];
+  tokens.slice(1).forEach((token) => {
     const argument = document.createElement("span");
-    argument.className = token.startsWith("-")
-      ? "terminal-flag"
-      : token.startsWith("'") || token.startsWith('"')
+    argument.className =
+      token.startsWith("'") || token.startsWith('"')
         ? "terminal-string"
         : "terminal-argument";
     argument.textContent = ` ${token}`;
     line.append(argument);
   });
-}
-
-function appendLogLine(entry, index) {
-  const terminalOutput = document.querySelector(".terminal-output");
-  const line = document.createElement("p");
-  line.className = `terminal-log log-level-${entry.level.toLowerCase()}`;
-  const prefix = document.createElement("span");
-  prefix.className = "log-level";
-  prefix.textContent = `${entry.level} `;
-  const message = document.createElement("span");
-  message.textContent = entry.message;
-  line.append(prefix, message);
-  line.dataset.logIndex = String(index);
   terminalOutput.append(line);
-
-  const oldLines = terminalOutput.querySelectorAll(".terminal-log");
-  if (oldLines.length > 6) oldLines[0].remove();
-  terminalOutput.parentElement.scrollTop =
-    terminalOutput.parentElement.scrollHeight;
+  scrollConsoleToEnd();
 }
 
-function scheduleLogcat() {
-  window.clearTimeout(logcatTimer);
-  if (
-    document.hidden ||
-    reduceMotionQuery.matches ||
-    !terminalVisible ||
-    !terminalTypingFinished
-  ) {
-    return;
-  }
-  const delay = 1500 + ((logcatIndex * 317) % 1501);
-  logcatTimer = window.setTimeout(() => {
-    const entry = terminal.logLevels[logcatIndex % terminal.logLevels.length];
-    appendLogLine(entry, logcatIndex);
-    logcatIndex += 1;
-    scheduleLogcat();
-  }, delay);
+function publishCommandResult(message, className = "terminal-result") {
+  appendConsoleLine(message, className);
+  terminalLive.textContent = message;
 }
 
-function animateTerminal() {
-  const terminalOutput = document.querySelector(".terminal-output");
-  if (
-    window.matchMedia("(prefers-reduced-motion: reduce)").matches ||
-    !terminal.showAnimation
-  ) {
-    completeTerminal();
+function scrollToSection(id) {
+  document.getElementById(id)?.scrollIntoView({
+    behavior: reduceMotionQuery.matches ? "auto" : "smooth",
+    block: "start",
+  });
+}
+
+function runTerminalCommand(rawCommand) {
+  const commandText = rawCommand.trim();
+  if (!commandText) return;
+  const [name, ...args] = commandText.split(/\s+/);
+  const command = terminal.commands.find((entry) => entry.name === name);
+  terminalInput.value = "";
+  historyCursor = terminalHistory.length;
+  terminalHistory.push(commandText);
+  if (terminalHistory.length > 50) terminalHistory.shift();
+  appendCommandEcho(commandText);
+  recordActivity("D", "commandRun", { command: name });
+
+  if (!command) {
+    publishCommandResult(
+      localizeMessage(terminal.text.unknownCommand, { command: name }),
+      "terminal-error",
+    );
     return;
   }
 
-  let stepIndex = 0;
-  const runId = ++terminalRunId;
-  const typeStep = () => {
-    if (runId !== terminalRunId) return;
-    if (stepIndex >= terminal.steps.length) return;
+  const output = [];
+  const usageError = () =>
+    localizeMessage(terminal.text.missingArgument, {
+      usage: command.usage || command.name,
+    });
 
-    const step = terminal.steps[stepIndex];
-    const commandLine = document.createElement("p");
-    commandLine.className = "terminal-command";
-    terminalOutput.append(commandLine);
-    const commandText = `${terminal.prompt} ${step.command}`;
-    let characterIndex = 0;
-
-    const typeCharacter = () => {
-      if (runId !== terminalRunId) return;
-      commandLine.textContent = commandText.slice(0, characterIndex);
-      characterIndex += 1;
-      if (characterIndex <= commandText.length) {
-        window.setTimeout(typeCharacter, 30);
+  switch (command.action) {
+    case "help":
+      output.push(terminal.text.helpHeading);
+      terminal.commands.forEach((entry) => {
+        output.push(
+          `${entry.usage || entry.name} — ${entry.description}`,
+        );
+      });
+      break;
+    case "about":
+      output.push(terminal.text.profileHeading);
+      output.push(content.hero.description);
+      content.about.paragraphs.forEach((paragraph) => output.push(paragraph));
+      break;
+    case "skills":
+      output.push(terminal.text.skillsHeading);
+      content.skills.groups.forEach((group) => {
+        output.push(`${group.name}: ${group.items.join(", ")}`);
+      });
+      break;
+    case "projects":
+      output.push(terminal.text.projectsHeading);
+      content.projects.items.forEach((project, index) => {
+        output.push(`${project.id || index + 1} — ${project.name}`);
+      });
+      scrollToSection("projects");
+      break;
+    case "open": {
+      const requestedId = args[0];
+      if (!requestedId) {
+        publishCommandResult(usageError(), "terminal-error");
         return;
       }
+      const projectElement = [...projectList.querySelectorAll(".project-details")]
+        .find((element) => element.dataset.projectId === requestedId);
+      if (!projectElement) {
+        publishCommandResult(
+          localizeMessage(terminal.text.projectMissing, { id: requestedId }),
+          "terminal-error",
+        );
+        return;
+      }
+      projectElement.open = true;
+      projectElement.querySelector("summary").scrollIntoView({
+        behavior: reduceMotionQuery.matches ? "auto" : "smooth",
+        block: "center",
+      });
+      output.push(
+        localizeMessage(terminal.text.projectOpened, {
+          name: projectElement.dataset.projectName,
+        }),
+      );
+      break;
+    }
+    case "contact":
+      scrollToSection("contact");
+      output.push(terminal.text.contactOpened);
+      break;
+    case "theme": {
+      const theme = args[0]?.toLowerCase();
+      if (!["dark", "light"].includes(theme)) {
+        publishCommandResult(usageError(), "terminal-error");
+        return;
+      }
+      changeTheme(theme);
+      output.push(localizeMessage(terminal.text.themeChanged, { theme }));
+      break;
+    }
+    case "lang": {
+      const targetLocale = args[0]?.toLowerCase();
+      if (!data.locales[targetLocale]) {
+        publishCommandResult(usageError(), "terminal-error");
+        return;
+      }
+      if (targetLocale === locale) {
+        output.push(
+          localizeMessage(terminal.text.languageChanged, {
+            language: data.localeNames[locale] || locale,
+          }),
+        );
+        break;
+      }
+      sessionStorage.setItem("portfolio-pending-language", targetLocale);
+      localStorage.setItem("portfolio-locale", targetLocale);
+      location.reload();
+      return;
+    }
+    case "clear":
+      terminalOutput.replaceChildren();
+      terminalLive.textContent = terminal.text.consoleCleared;
+      return;
+    case "neofetch": {
+      const connection =
+        navigator.connection ||
+        navigator.mozConnection ||
+        navigator.webkitConnection;
+      const memory = navigator.deviceMemory
+        ? `${navigator.deviceMemory} GB`
+        : terminal.text.notAvailable;
+      const connectionType = connection
+        ? [
+            connection.effectiveType,
+            Number.isFinite(connection.downlink)
+              ? `${connection.downlink} Mb/s`
+              : "",
+            Number.isFinite(connection.rtt) ? `RTT ${connection.rtt} ms` : "",
+          ]
+            .filter(Boolean)
+            .join(" · ")
+        : terminal.text.notAvailable;
+      output.push(terminal.text.neofetchHeading);
+      output.push(`${terminal.text.userAgent}: ${navigator.userAgent.slice(0, 120)}`);
+      output.push(`${terminal.text.language}: ${navigator.language}`);
+      output.push(`${terminal.text.screen}: ${screen.width} × ${screen.height}`);
+      output.push(
+        `${terminal.text.cores}: ${navigator.hardwareConcurrency || terminal.text.notAvailable}`,
+      );
+      output.push(`${terminal.text.memory}: ${memory}`);
+      output.push(`${terminal.text.connection}: ${connectionType}`);
+      break;
+    }
+    case "history":
+      if (terminalHistory.length === 0) output.push(terminal.text.historyEmpty);
+      else terminalHistory.forEach((entry, index) => output.push(`${index + 1}  ${entry}`));
+      break;
+    default:
+      publishCommandResult(
+        localizeMessage(terminal.text.unknownCommand, { command: name }),
+        "terminal-error",
+      );
+      return;
+  }
 
-      formatTerminalCommand(commandLine, step.command);
-      window.setTimeout(() => {
-        if (runId !== terminalRunId) return;
-        const outputLine = document.createElement("p");
-        outputLine.className = "terminal-result";
-        outputLine.textContent = step.output;
-        terminalOutput.append(outputLine);
-        stepIndex += 1;
-        window.setTimeout(() => {
-          if (stepIndex < terminal.steps.length) {
-            typeStep();
-          } else {
-            terminalTypingFinished = true;
-            scheduleLogcat();
-          }
-        }, 160);
-      }, 180);
-    };
-
-    typeCharacter();
-  };
-
-  typeStep();
+  output.forEach((line, index) =>
+    publishCommandResult(line, index === 0 ? "terminal-result" : "terminal-result"),
+  );
 }
 
-animateTerminal();
+function setTerminalTab(tabName, focusTab = false) {
+  const tabs = [...document.querySelectorAll("[data-terminal-tab]")];
+  tabs.forEach((tab) => {
+    const selected = tab.dataset.terminalTab === tabName;
+    tab.setAttribute("aria-selected", String(selected));
+    tab.tabIndex = selected ? 0 : -1;
+    const panel = document.getElementById(`${tabName}-panel`);
+    if (selected) panel?.removeAttribute("hidden");
+    else document.getElementById(`${tab.dataset.terminalTab}-panel`)?.setAttribute("hidden", "");
+    if (selected && focusTab) tab.focus();
+  });
+
+  monitorActive = tabName === "monitor";
+  if (monitorActive) startMonitorUpdates();
+  else stopMonitorUpdates();
+  if (tabName === "logcat") renderLogcat();
+}
+
+const terminalTabs = [...document.querySelectorAll("[data-terminal-tab]")];
+terminalTabs.forEach((tab, index) => {
+  tab.addEventListener("click", () => setTerminalTab(tab.dataset.terminalTab));
+  tab.addEventListener("keydown", (event) => {
+    const rtl = document.documentElement.dir === "rtl";
+    const step = event.key === "ArrowRight" ? (rtl ? -1 : 1) :
+      event.key === "ArrowLeft" ? (rtl ? 1 : -1) : 0;
+    const targetIndex =
+      event.key === "Home" ? 0 :
+      event.key === "End" ? terminalTabs.length - 1 :
+      (index + step + terminalTabs.length) % terminalTabs.length;
+    if (step || event.key === "Home" || event.key === "End") {
+      event.preventDefault();
+      setTerminalTab(terminalTabs[targetIndex].dataset.terminalTab, true);
+    }
+  });
+});
+
+document.querySelector(".terminal-input-form").addEventListener(
+  "submit",
+  (event) => {
+    event.preventDefault();
+    runTerminalCommand(terminalInput.value);
+  },
+);
+terminalInput.addEventListener("keydown", (event) => {
+  if (event.key === "ArrowUp" || event.key === "ArrowDown") {
+    event.preventDefault();
+    if (event.key === "ArrowUp") historyCursor = Math.max(0, historyCursor - 1);
+    else historyCursor = Math.min(terminalHistory.length, historyCursor + 1);
+    terminalInput.value = terminalHistory[historyCursor] || "";
+    return;
+  }
+  if (event.key !== "Tab") return;
+  event.preventDefault();
+  const [first, second] = terminalInput.value.split(/\s+/);
+  let candidates = terminal.commands.map((entry) => entry.name);
+  if (first === "theme") candidates = ["dark", "light"];
+  if (first === "lang") candidates = Object.keys(data.locales);
+  if (first === "open") {
+    candidates = content.projects.items.map(
+      (project, index) => project.id || String(index + 1),
+    );
+  }
+  const current = second === undefined ? first : second;
+  const match = candidates.find((candidate) => candidate.startsWith(current || ""));
+  if (!match) return;
+  terminalInput.value =
+    second === undefined ? match : `${first} ${match}`;
+});
+
+document.querySelectorAll(".terminal-chip").forEach((chip) => {
+  chip.addEventListener("click", () => {
+    setTerminalTab("console");
+    runTerminalCommand(chip.dataset.command);
+  });
+});
+
+document.querySelectorAll("[data-log-filter]").forEach((button) => {
+  button.addEventListener("click", () => {
+    logLevelFilter = button.dataset.logFilter;
+    document.querySelectorAll("[data-log-filter]").forEach((filter) => {
+      filter.setAttribute(
+        "aria-pressed",
+        String(filter === button),
+      );
+    });
+    renderLogcat();
+  });
+});
+document.querySelector(".logcat-clear").addEventListener("click", () => {
+  activityLog.length = 0;
+  renderLogcat();
+});
+
+const nowPanel = document.querySelector(".now-panel");
+appendConsoleLine(terminal.text.ready);
+
+function renderNow(status, title, message = "", updated = "") {
+  nowPanel.querySelector("[data-now-status]").textContent = status;
+  nowPanel.querySelector("[data-now-title]").textContent = title;
+  nowPanel.querySelector("[data-now-message]").textContent = message;
+  nowPanel.querySelector("[data-now-updated]").textContent = updated;
+}
+
+function renderSampleNow(extraMessage = "") {
+  const message = [now.sampleMessage, extraMessage].filter(Boolean).join(" ");
+  renderNow(
+    now.sampleStatus,
+    now.sampleTitle,
+    message,
+    `${now.updated} · ${now.sampleStatus}`,
+  );
+}
+
+function formatRelativeTime(date) {
+  const elapsedMinutes = Math.max(
+    0,
+    Math.floor((Date.now() - date.getTime()) / 60000),
+  );
+  if (elapsedMinutes < 1) return terminal.text.relativeNow;
+  if (elapsedMinutes < 60) {
+    return localizeMessage(terminal.text.relativeMinutes, {
+      count: new Intl.NumberFormat(locale).format(elapsedMinutes),
+    });
+  }
+  const elapsedHours = Math.floor(elapsedMinutes / 60);
+  if (elapsedHours < 24) {
+    return localizeMessage(terminal.text.relativeHours, {
+      count: new Intl.NumberFormat(locale).format(elapsedHours),
+    });
+  }
+  return localizeMessage(terminal.text.relativeDays, {
+    count: new Intl.NumberFormat(locale).format(
+      Math.floor(elapsedHours / 24),
+    ),
+  });
+}
+
+function renderGitHubActivity(activity) {
+  const date = new Date(activity.date);
+  if (Number.isNaN(date.getTime())) {
+    throw new Error("GitHub activity returned an invalid timestamp.");
+  }
+  renderNow(
+    now.status,
+    activity.message,
+    activity.repository,
+    `${now.updated} · ${formatRelativeTime(date)}`,
+  );
+}
+
+function isValidGitHubActivity(activity) {
+  return (
+    activity &&
+    typeof activity.message === "string" &&
+    typeof activity.repository === "string" &&
+    typeof activity.date === "string"
+  );
+}
+
+async function fetchLatestGitHubActivity(username) {
+  const encodedUsername = encodeURIComponent(username);
+  const eventsResponse = await fetch(
+    `https://api.github.com/users/${encodedUsername}/events/public?per_page=30`,
+    { headers: { Accept: "application/vnd.github+json" } },
+  );
+  if (!eventsResponse.ok) {
+    throw new Error(`GitHub events returned ${eventsResponse.status}.`);
+  }
+  const events = await eventsResponse.json();
+  const latestPush = events.find(
+    (event) =>
+      event.type === "PushEvent" &&
+      Array.isArray(event.payload?.commits) &&
+      event.payload.commits.length > 0,
+  );
+  if (latestPush) {
+    const commit = latestPush.payload.commits.at(-1);
+    return {
+      message: commit.message,
+      repository: latestPush.repo.name,
+      date: latestPush.created_at,
+    };
+  }
+
+  const reposResponse = await fetch(
+    `https://api.github.com/users/${encodedUsername}/repos?sort=updated&per_page=1`,
+    { headers: { Accept: "application/vnd.github+json" } },
+  );
+  if (!reposResponse.ok) {
+    throw new Error(`GitHub repositories returned ${reposResponse.status}.`);
+  }
+  const repositories = await reposResponse.json();
+  const repository = repositories[0];
+  if (!repository?.full_name) return null;
+
+  const commitResponse = await fetch(
+    `https://api.github.com/repos/${repository.full_name}/commits?per_page=1`,
+    { headers: { Accept: "application/vnd.github+json" } },
+  );
+  if (!commitResponse.ok) {
+    throw new Error(`GitHub commits returned ${commitResponse.status}.`);
+  }
+  const commits = await commitResponse.json();
+  const latestCommit = commits[0];
+  if (!latestCommit?.commit?.message || !latestCommit.commit.author?.date) {
+    return null;
+  }
+  return {
+    message: latestCommit.commit.message,
+    repository: repository.full_name,
+    date: latestCommit.commit.author.date,
+  };
+}
+
+async function loadGitHubActivity() {
+  const username = data.github?.username?.trim();
+  if (!username) {
+    renderSampleNow(now.missingUsername);
+    return;
+  }
+
+  const cacheKey = `portfolio-github-activity:${username.toLowerCase()}`;
+  const cachedText = localStorage.getItem(cacheKey);
+  if (cachedText) {
+    try {
+      const cached = JSON.parse(cachedText);
+      if (
+        isValidGitHubActivity(cached?.activity) &&
+        Number.isFinite(cached?.fetchedAt) &&
+        Date.now() - cached.fetchedAt < 30 * 60 * 1000
+      ) {
+        renderGitHubActivity(cached.activity);
+        return;
+      }
+      localStorage.removeItem(cacheKey);
+    } catch (error) {
+      if (!(error instanceof SyntaxError)) throw error;
+      localStorage.removeItem(cacheKey);
+    }
+  }
+
+  try {
+    const activity = await fetchLatestGitHubActivity(username);
+    if (!activity) {
+      renderNow(now.status, terminal.text.noPublicActivity);
+      return;
+    }
+    if (!isValidGitHubActivity(activity)) {
+      throw new Error("GitHub returned an incomplete activity record.");
+    }
+    localStorage.setItem(
+      cacheKey,
+      JSON.stringify({ activity, fetchedAt: Date.now() }),
+    );
+    renderGitHubActivity(activity);
+  } catch (error) {
+    console.warn("GitHub activity unavailable; showing the sample snapshot.", error);
+    recordActivity("W", "githubUnavailable");
+    renderSampleNow(now.unavailable);
+  }
+}
+
+loadGitHubActivity();
 
 const aboutSection = document.querySelector("#about");
 aboutSection.innerHTML = `
   <div class="section-heading">
     <p class="section-index">${content.about.index}</p>
     <h2 class="section-title" id="about-title">${content.about.title}</h2>
+    <span class="content-sample-label">${content.about.sampleLabel}</span>
   </div>
   <div class="about-copy">
     ${content.about.paragraphs.map((paragraph) => `<p>${paragraph}</p>`).join("")}
@@ -481,7 +1003,7 @@ aboutSection.innerHTML = `
         (metric) => `
           <div class="metric-item">
             <span class="metric-value counter-value" data-count-target="${metric.value}" data-count-suffix="${metric.suffix}" aria-hidden="true">0${metric.suffix}</span>
-            <span class="metric-label">${metric.label}</span>
+            <span class="metric-label">${content.about.metricSampleLabel} · ${metric.label}</span>
             <span class="sr-only">${metric.label}: ${metric.value}${metric.suffix}</span>
           </div>
         `,
@@ -555,6 +1077,7 @@ skillsSection.innerHTML = `
   <div class="section-heading">
     <p class="section-index">${content.skills.index}</p>
     <h2 class="section-title" id="skills-title">${content.skills.title}</h2>
+    <span class="content-sample-label">${content.skills.sampleLabel}</span>
   </div>
   <table class="skill-table"><tbody>${skillRows}</tbody></table>
 `;
@@ -614,10 +1137,10 @@ projectList.innerHTML = projectsSection.items
 
     return `
       <li class="project-entry project-category--${project.category}">
-        <details class="project-details" data-category="${project.category}" data-lifecycle="${project.lifecycle}" data-technologies="${technologies}"${repository}>
+        <details class="project-details" data-project-id="${project.id || index + 1}" data-project-name="${project.name}" data-category="${project.category}" data-lifecycle="${project.lifecycle}" data-technologies="${technologies}"${repository}>
           <summary class="project-row">
             <span class="project-number">${String(index + 1).padStart(2, "0")}</span>
-            <span class="project-name">${project.name}</span>
+            <span class="project-name">${project.name}<span class="project-sample-tag">${projectsSection.sampleLabel}</span></span>
             <span class="project-type">${project.type}</span>
             <span class="project-technologies">${project.technologies.join(" / ")}</span>
             <span class="project-year">${project.year}</span>
@@ -659,6 +1182,16 @@ projectList.innerHTML = projectsSection.items
   })
   .join("");
 
+projectList.querySelectorAll(".project-details").forEach((project) => {
+  project.addEventListener("toggle", () => {
+    if (project.open) {
+      recordActivity("D", "projectEvent", {
+        name: project.dataset.projectName,
+      });
+    }
+  });
+});
+
 let selectedSkill = "";
 const skillTags = [...document.querySelectorAll(".skill-tag")];
 
@@ -697,68 +1230,159 @@ skillTags.forEach((tag) => {
   });
 });
 
-const reduceMotionQuery = window.matchMedia(
-  "(prefers-reduced-motion: reduce)",
-);
 let counterObserver;
 const counterFrames = new Map();
-const monitorCharts = [...document.querySelectorAll(".monitor-metric")];
-const monitorSettings = content.hero.monitor;
-let monitorStep = 0;
-let monitorTimer = 0;
 let clockTimer = 0;
 let uptimeSeconds = 0;
 let headerVisible = true;
-let monitorVisible = true;
+let monitorStaticSampleTaken = false;
 
-function getMonitorValue(key, sampleIndex, step) {
-  const seed = monitorSettings.seed;
-  const wave =
-    Math.sin((sampleIndex + step) * 0.39 + seed) * 0.18 +
-    Math.sin((sampleIndex + step) * 0.17 + seed * 0.4) * 0.08;
-  const level = Math.max(0.12, Math.min(0.9, 0.53 + wave));
-  if (key === "cpu") return Math.round(24 + level * 52);
-  if (key === "memory") return Math.round(480 + level * 420);
-  return Number((0.4 + level * 6.2).toFixed(1));
+function getNavigationLoadTime() {
+  const navigationTiming = performance.getEntriesByType("navigation")[0];
+  if (!navigationTiming) return null;
+  const loadTime = navigationTiming.loadEventEnd || navigationTiming.duration;
+  return Number.isFinite(loadTime) && loadTime > 0
+    ? Math.round(loadTime)
+    : null;
 }
 
-function renderMonitor(step) {
+function getMonitorSnapshot(fps) {
+  const memoryBytes = performance.memory?.usedJSHeapSize;
+  const memoryValue = Number.isFinite(memoryBytes)
+    ? Number((memoryBytes / 1024 / 1024).toFixed(1))
+    : null;
+  const connection =
+    navigator.connection ||
+    navigator.mozConnection ||
+    navigator.webkitConnection;
+
+  if (connection) {
+    const downlink = Number.isFinite(connection.downlink)
+      ? Number(connection.downlink.toFixed(1))
+      : null;
+    const details = [
+      Number.isFinite(connection.rtt)
+        ? `${monitor.latencyLabel} ${connection.rtt} ms`
+        : "",
+      connection.effectiveType || "",
+    ].filter(Boolean);
+    return {
+      fps,
+      memory: memoryValue,
+      network: downlink,
+      networkUnit: monitor.units.network,
+      networkDetail: details.join(" · "),
+    };
+  }
+
+  const loadTime = getNavigationLoadTime();
+  return {
+    fps,
+    memory: memoryValue,
+    network: loadTime,
+    networkUnit: loadTime === null ? "" : "ms",
+    networkDetail:
+      loadTime === null
+        ? ""
+        : `${monitor.pageLoadLabel} ${loadTime} ms`,
+  };
+}
+
+function pushMonitorValue(key, value) {
+  if (!Number.isFinite(value)) return;
+  const values = monitorValues[key];
+  values.push(value);
+  if (values.length > 24) values.shift();
+}
+
+function renderSparkline(metric, values) {
+  const line = metric.querySelector(".sparkline-line");
+  if (values.length < 2) {
+    line.removeAttribute("d");
+    return;
+  }
+  const min = Math.min(...values);
+  const max = Math.max(...values);
+  const span = max - min || 1;
+  const path = values
+    .map((value, index) => {
+      const x = (index / (values.length - 1)) * 120;
+      const y = 34 - ((value - min) / span) * 28;
+      return `${index ? "L" : "M"}${x.toFixed(1)} ${y.toFixed(1)}`;
+    })
+    .join(" ");
+  line.setAttribute("d", path);
+}
+
+function renderMonitorSnapshot(snapshot) {
   monitorCharts.forEach((metric) => {
     const key = metric.dataset.monitor;
-    const values = Array.from({ length: 24 }, (_, index) =>
-      getMonitorValue(key, index, step),
-    );
-    const min = Math.min(...values);
-    const max = Math.max(...values);
-    const span = max - min || 1;
-    const points = values.map((value, index) => {
-      const x = (index / (values.length - 1)) * 120;
-      const y = 33 - ((value - min) / span) * 25;
-      return [x, y];
-    });
-    const linePath = points
-      .map(([x, y], index) => `${index ? "L" : "M"}${x.toFixed(1)} ${y.toFixed(1)}`)
-      .join(" ");
-    const areaPath = `${linePath} L120 40 L0 40 Z`;
-    metric.querySelector(".sparkline-line").setAttribute("d", linePath);
-    metric.querySelector(".sparkline-area").setAttribute("d", areaPath);
-
-    const reading = values[values.length - 1];
-    metric.querySelector("[data-reading]").textContent = String(reading);
+    const value = snapshot[key];
+    const unit = key === "network" ? snapshot.networkUnit : monitor.units[key];
+    metric.querySelector("[data-reading]").textContent =
+      value === null ? "n/a" : String(value);
+    metric.querySelector("[data-unit]").textContent = value === null ? "" : unit;
+    metric.querySelector("[data-monitor-detail]").textContent =
+      key === "network" ? snapshot.networkDetail : "";
     metric.querySelector(".sparkline").setAttribute(
       "aria-label",
-      `${monitorSettings.labels[key]}: ${reading} ${monitorSettings.units[key]}`,
+      `${monitor.labels[key]}: ${value === null ? "n/a" : `${value} ${unit}`}`,
     );
+    if (Number.isFinite(value)) pushMonitorValue(key, value);
+    renderSparkline(metric, monitorValues[key]);
   });
 }
 
+function sampleMonitorOnce() {
+  const snapshot = getMonitorSnapshot(null);
+  ["memory", "network"].forEach((key) => {
+    const value = snapshot[key];
+    if (Number.isFinite(value)) {
+      monitorValues[key] = Array.from({ length: 24 }, () => value);
+    }
+  });
+  renderMonitorSnapshot(snapshot);
+  monitorStaticSampleTaken = true;
+}
+
+function stopMonitorUpdates() {
+  if (monitorFrame) window.cancelAnimationFrame(monitorFrame);
+  monitorFrame = 0;
+  monitorSampleTimestamp = 0;
+  monitorSampleCount = 0;
+}
+
 function startMonitorUpdates() {
-  window.clearInterval(monitorTimer);
-  if (reduceMotionQuery.matches || document.hidden || !monitorVisible) return;
-  monitorTimer = window.setInterval(() => {
-    monitorStep += 1;
-    renderMonitor(monitorStep);
-  }, 1000);
+  if (!monitorActive || !monitorViewportVisible || document.hidden) {
+    stopMonitorUpdates();
+    return;
+  }
+  if (reduceMotionQuery.matches) {
+    stopMonitorUpdates();
+    if (!monitorStaticSampleTaken) sampleMonitorOnce();
+    return;
+  }
+  if (monitorFrame) return;
+
+  monitorStaticSampleTaken = false;
+  const tick = (timestamp) => {
+    monitorFrame = 0;
+    if (!monitorActive || !monitorViewportVisible || document.hidden) return;
+    if (!monitorSampleTimestamp) {
+      monitorSampleTimestamp = timestamp;
+    }
+    monitorSampleCount += 1;
+
+    if (timestamp - monitorSampleTimestamp >= 500) {
+      const elapsed = timestamp - monitorSampleTimestamp;
+      const fps = Math.round((monitorSampleCount * 1000) / elapsed);
+      renderMonitorSnapshot(getMonitorSnapshot(fps));
+      monitorSampleTimestamp = timestamp;
+      monitorSampleCount = 0;
+    }
+    monitorFrame = window.requestAnimationFrame(tick);
+  };
+  monitorFrame = window.requestAnimationFrame(tick);
 }
 
 function updateUptime() {
@@ -780,9 +1404,8 @@ function startStatusUpdates() {
 }
 
 function stopLiveUpdates() {
-  window.clearInterval(monitorTimer);
+  stopMonitorUpdates();
   window.clearInterval(clockTimer);
-  window.clearTimeout(logcatTimer);
 }
 
 function renderCounterValue(element, value) {
@@ -946,6 +1569,7 @@ contactForm.addEventListener("submit", async (event) => {
     return;
   }
 
+  recordActivity("I", "formSubmitted");
   formSubmit.disabled = true;
   formSubmit.textContent = contact.form.sending;
 
@@ -978,10 +1602,12 @@ contactForm.addEventListener("submit", async (event) => {
     contactForm.reset();
     contactForm.dataset.state = "success";
     formStatus.textContent = contact.form.success;
+    recordActivity("I", "formSucceeded");
   } catch (error) {
     console.error("Unable to submit the contact form.", error);
     contactForm.dataset.state = "error";
     formStatus.textContent = contact.form.error;
+    recordActivity("E", "formFailed");
   } finally {
     formSubmit.disabled = false;
     formSubmit.textContent = contact.form.submit;
@@ -1017,7 +1643,6 @@ function updateLocalTime() {
 }
 
 updateLocalTime();
-renderMonitor(0);
 
 const revealElements = document.querySelectorAll(
   ".hero-copy, .profile-spec, .section-heading, .about-copy, .skill-table, .project-list, .contact-layout, .activity-panel",
@@ -1039,7 +1664,6 @@ function resumeArchitectureFlow() {
 
 function setFinalMotionState() {
   stopLiveUpdates();
-  terminalTypingFinished = true;
   counterFrames.forEach((frame) => window.cancelAnimationFrame(frame));
   counterFrames.clear();
   document
@@ -1056,7 +1680,6 @@ function setFinalMotionState() {
   document.querySelectorAll("[data-count-target]").forEach((element) => {
     renderCounterValue(element, Number(element.dataset.countTarget));
   });
-  completeTerminal();
   pauseArchitectureFlow();
 }
 
@@ -1088,33 +1711,16 @@ function initializeDrawingsAndCounters() {
     const liveObserver = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
-          if (entry.target.matches(".system-monitor")) {
-            entry.target.classList.toggle("is-visible", entry.isIntersecting);
-            monitorVisible = entry.isIntersecting;
-            if (monitorVisible) {
-              renderMonitor(monitorStep);
-              startMonitorUpdates();
-            } else {
-              window.clearInterval(monitorTimer);
-            }
-          } else if (entry.target.matches(".status-bar")) {
+          if (entry.target.matches(".status-bar")) {
             headerVisible = entry.isIntersecting;
             document
               .querySelector(".site-header")
               .classList.toggle("is-visible", headerVisible);
             startStatusUpdates();
           } else if (entry.target.matches(".terminal-block")) {
-            terminalVisible = entry.isIntersecting;
-            entry.target.classList.toggle("is-visible", terminalVisible);
-            if (terminalVisible) {
-              scheduleLogcat();
-            } else {
-              window.clearTimeout(logcatTimer);
-              if (!terminalTypingFinished) {
-                terminalTypingFinished = true;
-                completeTerminal();
-              }
-            }
+            entry.target.classList.toggle("is-visible", entry.isIntersecting);
+            monitorViewportVisible = entry.isIntersecting;
+            startMonitorUpdates();
           } else if (entry.target.matches(".now-panel")) {
             entry.target.classList.toggle("is-visible", entry.isIntersecting);
           }
@@ -1123,10 +1729,12 @@ function initializeDrawingsAndCounters() {
       { threshold: 0.05 },
     );
     document
-      .querySelectorAll(
-        ".system-monitor, .status-bar, .terminal-block, .now-panel",
-      )
-      .forEach((target) => liveObserver.observe(target));
+    .querySelectorAll(".status-bar, .terminal-block, .now-panel")
+    .forEach((target) => liveObserver.observe(target));
+  }
+
+  if (!("IntersectionObserver" in window)) {
+    monitorViewportVisible = true;
   }
 
   if (
@@ -1202,10 +1810,10 @@ function initializeDrawingsAndCounters() {
 reduceMotionQuery.addEventListener("change", (event) => {
   if (event.matches) {
     setFinalMotionState();
+    startMonitorUpdates();
   } else {
     startStatusUpdates();
     startMonitorUpdates();
-    if (terminalTypingFinished) scheduleLogcat();
     resumeArchitectureFlow();
   }
 });
@@ -1217,10 +1825,6 @@ startMonitorUpdates();
 document.addEventListener("visibilitychange", () => {
   if (document.hidden) {
     document.body.classList.add("page-hidden");
-    if (!reduceMotionQuery.matches) {
-      terminalTypingFinished = true;
-      completeTerminal();
-    }
     stopLiveUpdates();
     pauseArchitectureFlow();
     return;
@@ -1229,7 +1833,6 @@ document.addEventListener("visibilitychange", () => {
   document.body.classList.remove("page-hidden");
   startStatusUpdates();
   startMonitorUpdates();
-  if (terminalTypingFinished) scheduleLogcat();
   resumeArchitectureFlow();
 });
 
@@ -1264,6 +1867,7 @@ updateScrollProgress();
 const navigation = document.querySelector(".site-navigation");
 const navIndicator = navigation.querySelector(".nav-indicator");
 const navigationLinks = [...navigation.querySelectorAll("a[href^='#']")];
+let lastLoggedSection = "";
 
 function setActiveNavigation(link) {
   navigationLinks.forEach((item) => {
@@ -1286,7 +1890,14 @@ if ("IntersectionObserver" in window) {
       const link = navigation.querySelector(
         `a[href="#${activeEntry.target.id}"]`,
       );
-      if (link) setActiveNavigation(link);
+      if (link) {
+        setActiveNavigation(link);
+        const section = link.textContent.trim();
+        if (section !== lastLoggedSection) {
+          lastLoggedSection = section;
+          recordActivity("I", "sectionEvent", { section });
+        }
+      }
     },
     { rootMargin: "-25% 0px -65% 0px", threshold: [0, 0.1, 0.5] },
   );

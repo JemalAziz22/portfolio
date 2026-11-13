@@ -7,6 +7,11 @@ A static, single-page portfolio built with semantic HTML, CSS, and vanilla JavaS
 ```text
 assets/
   favicon.svg
+  icons.svg
+  noise.svg
+  profile.png
+  profile-480.webp
+  profile-800.webp
 css/
   styles.css
   tokens.css
@@ -26,9 +31,13 @@ Open `index.html` in a browser, or serve the project directory with any static f
 Edit `data/data.js`; the HTML structure and CSS do not need content changes.
 
 - Replace profile name and location in `locales.en.status` and `locales.ar.status`.
+- Put the original portrait in `assets/profile.png` (or update `profileImage.src` in `data/data.js`). The card uses a 4:5 crop and `profileImage.position` controls the crop focus. Create `profile-480.webp` (480×600) and `profile-800.webp` (800×1000), then set `profileImage.srcSet` to `assets/profile-480.webp 480w, assets/profile-800.webp 800w`. If the source cannot load, the monogram remains visible.
 - Update the hero, about, skills, projects, contact copy, and footer in both locale objects.
-- Edit `hero.terminal.steps` and `hero.terminal.logLevels` for the terminal demo. Update `hero.monitor.seed` and `about.activitySeed` to change the simulated system readings and activity heatmap; these are illustrative, not live device telemetry.
-- Update the hero and about `metrics` values with verified counts before publishing. The displayed project count and years are placeholders.
+- Edit `hero.terminal.commands`, `quickCommands`, and `text` in `data/data.js` to configure the terminal command list, quick-action chips, and their bilingual output. Commands are handled by a fixed allowlist in `js/app.js`; adding a new action requires a corresponding handler.
+- The Monitor tab reads the current browser session: frame rate from `requestAnimationFrame`, JS heap when `performance.memory` is available, and connection information when `navigator.connection` is supported. Otherwise it reports `n/a` or the navigation load time; it does not invent telemetry.
+- The Logcat tab records actual page, navigation, theme, terminal, project, and contact-form events. Its in-memory log is capped at 50 entries and is cleared on reload.
+- Set `github.username` at the root of `data/data.js` to show recent public GitHub activity in the Now panel. Successful results are cached in `localStorage` for 30 minutes. With no username or on request failure, the panel explicitly marks its text as a sample.
+- Update the hero and about `metrics` values with verified counts before publishing. Sample profile details, metrics, and projects are visibly marked as sample content.
 - Add projects to each locale's `projects.items`. To load live GitHub stars and forks, set `repository` to `owner/repository`. If the request fails or the field is empty, the project's `fallbackStats` are shown.
 - Project links are omitted when `codeUrl` and `liveUrl` are empty.
 - To add another language, add its name to `localeNames` and a complete locale object with a `direction` (`ltr` or `rtl`) and the same content fields. The language switch cycles through the locale keys.
