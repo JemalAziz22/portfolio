@@ -1,4 +1,4 @@
-# Systems Engineer & Android Developer Portfolio
+# Jemal Aziz — Computer Systems Engineer Portfolio
 
 A static, single-page portfolio built with semantic HTML, CSS, and vanilla JavaScript. No framework, package manager, or build step is required.
 
@@ -10,8 +10,6 @@ assets/
   icons.svg
   noise.svg
   profile.png
-  profile-480.webp
-  profile-800.webp
 css/
   styles.css
   tokens.css
@@ -30,17 +28,19 @@ Open `index.html` in a browser, or serve the project directory with any static f
 
 Edit `data/data.js`; the HTML structure and CSS do not need content changes.
 
-- Replace profile name and location in `locales.en.status` and `locales.ar.status`.
+- Edit the name and location in each `locales.*.status` object. The portfolio currently includes English (`en`), Arabic (`ar`), and Kurmanji Kurdish (`ku`, LTR).
+- Set the fixed logo initials in `monogram` and the live clock zone in `timeZone` (`Asia/Damascus`).
 - Put the original portrait in `assets/profile.png` (or update `profileImage.src` in `data/data.js`). The card uses a 4:5 crop and `profileImage.position` controls the crop focus. Create `profile-480.webp` (480×600) and `profile-800.webp` (800×1000), then set `profileImage.srcSet` to `assets/profile-480.webp 480w, assets/profile-800.webp 800w`. If the source cannot load, the monogram remains visible.
-- Update the hero, about, skills, projects, contact copy, and footer in both locale objects.
-- Edit `hero.terminal.commands`, `quickCommands`, and `text` in `data/data.js` to configure the terminal command list, quick-action chips, and their bilingual output. Commands are handled by a fixed allowlist in `js/app.js`; adding a new action requires a corresponding handler.
+- Update the hero, about, skills, credentials, projects, contact copy, and footer in the locale objects.
+- Edit `hero.terminal.commands`, `quickCommands`, and `text` in `data/data.js` to configure the terminal command list, quick-action chips, and their localized output. Commands are handled by a fixed allowlist in `js/app.js`; adding a new action requires a corresponding handler.
 - The Monitor tab reads the current browser session: frame rate from `requestAnimationFrame`, JS heap when `performance.memory` is available, and connection information when `navigator.connection` is supported. Otherwise it reports `n/a` or the navigation load time; it does not invent telemetry.
 - The Logcat tab records actual page, navigation, theme, terminal, project, and contact-form events. Its in-memory log is capped at 50 entries and is cleared on reload.
-- Set `github.username` at the root of `data/data.js` to show recent public GitHub activity in the Now panel. Successful results are cached in `localStorage` for 30 minutes. With no username or on request failure, the panel explicitly marks its text as a sample.
-- Update the hero and about `metrics` values with verified counts before publishing. Sample profile details, metrics, and projects are visibly marked as sample content.
+- `github.username` is set to `JemalAziz22`; the Now panel uses public GitHub activity. Successful results are cached in `localStorage` for 30 minutes. The portfolio repository's stars and forks load from its repository API.
+- The verified five-year experience value is in the hero and about `metrics`. Other sample projects and their figures are visibly marked as sample content.
+- Set the ICDL role in `credentials.rows` and replace the availability status, email, LinkedIn, and Web3Forms placeholders before publishing.
 - Add projects to each locale's `projects.items`. To load live GitHub stars and forks, set `repository` to `owner/repository`. If the request fails or the field is empty, the project's `fallbackStats` are shown.
 - Project links are omitted when `codeUrl` and `liveUrl` are empty.
-- To add another language, add its name to `localeNames` and a complete locale object with a `direction` (`ltr` or `rtl`) and the same content fields. The language switch cycles through the locale keys.
+- To add another language, add its name to `localeNames` and a complete locale object with a `direction` (`ltr` or `rtl`) and the same content fields. The language switch and `lang` terminal command cycle through the locale keys.
 - Replace `settings.web3FormsAccessKey` with the access key from your Web3Forms dashboard. The contact button stays disabled while the placeholder key is present. The key is used in the browser, as required by Web3Forms; do not put private server credentials here.
 
 ## Design and preferences

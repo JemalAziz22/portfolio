@@ -1,10 +1,10 @@
-// PLACEHOLDER: All names, locations, experience, and project details below are fictional demo content.
 window.PORTFOLIO_DATA = {
   defaultLocale: "en",
-  localeNames: { en: "English", ar: "العربية" },
-  // PLACEHOLDER: Add your public GitHub username to enable the Now panel.
+  localeNames: { en: "English", ar: "العربية", ku: "Kurdî (Kurmanji)" },
+  timeZone: "Asia/Damascus",
+  monogram: "JA",
   github: {
-    username: "",
+    username: "JemalAziz22",
   },
   profileImage: {
     enabled: true,
@@ -21,17 +21,18 @@ window.PORTFOLIO_DATA = {
   locales: {
     en: {
       direction: "ltr",
-      documentTitle: "Omar Khalil — Systems Engineer & Android Developer",
+      documentTitle: "Jemal Aziz — Computer Systems Engineer · Android & Full-Stack Web Developer",
       description:
-        "Portfolio of Omar Khalil, a Computer Systems Engineering student exploring Android development and low-level systems programming.",
+        "Jemal Aziz is a Computer Systems Engineer, Android application developer, full-stack web developer, and ICDL Trainer based in Al-Hasakah, Syria.",
       status: {
         regionLabel: "Profile status",
-        name: "Omar Khalil",
+        name: "Jemal Aziz",
         locationLabel: "LOCATION",
-        location: "Amman, Jordan",
+        location: "Al-Hasakah, Syria",
         localTimeLabel: "LOCAL TIME",
-        availabilitySampleLabel: "SAMPLE",
-        available: "Open to internships",
+        // PLACEHOLDER: Replace this neutral availability status with a verified current status.
+        availabilitySampleLabel: "PLACEHOLDER",
+        available: "Available for work",
       },
       skipLink: "Skip to content",
       navigation: {
@@ -56,30 +57,28 @@ window.PORTFOLIO_DATA = {
         darkMode: "DARK",
       },
       hero: {
-        eyebrow: "SYSTEMS ENGINEERING / ANDROID",
-        sampleLabel: "SAMPLE COPY",
-        title: "Systems-minded engineer. Android developer.",
+        eyebrow: "COMPUTER SYSTEMS / ANDROID / FULL-STACK WEB",
+        sampleLabel: "",
+        title: "Computer Systems Engineer · Android Developer · Full-Stack Web Developer",
         titleParts: [
-          { text: "Systems-minded engineer. " },
-          { text: "Android developer.", accent: true },
+          { text: "Computer Systems Engineer · " },
+          { text: "Android Developer · Full-Stack Web Developer", accent: true },
         ],
         description:
-          "Computer Systems Engineering student building Android apps with Kotlin and exploring how software interacts with hardware through C++, Linux, and systems projects.",
+          "Computer Systems Engineer with five years of technical experience, developing Android applications and full-stack web applications across backend and frontend.",
         projectsLink: "Inspect selected projects",
         contactLink: "Contact",
         metrics: [
-          { label: "PROJECTS", value: 3, suffix: "" },
-          { label: "YEARS BUILDING", value: 2, suffix: "+" },
-          { label: "CORE LANGUAGES", value: 4, suffix: "" },
+          { label: "YEARS EXPERIENCE", value: 5, suffix: "" },
         ],
-        specLabel: "PROFILE / 0001",
+        specLabel: "PROFILE",
         identity: {
-          role: "Systems Engineering Student · Android Developer",
-          id: "0001",
-          sampleLabel: "PROFILE DETAILS / SAMPLE",
-          imageAlt: "Portrait of the portfolio owner",
+          role: "Computer Systems Engineer · Android · Full-Stack Web",
+          id: "",
+          sampleLabel: "",
+          imageAlt: "Portrait of Jemal Aziz",
         },
-        metricSampleLabel: "SAMPLE",
+        metricSampleLabel: "",
         diagramLabel: "Android system architecture",
         architecture: [
           { id: "hardware", label: "Hardware" },
@@ -106,7 +105,7 @@ window.PORTFOLIO_DATA = {
             { name: "open", action: "open", usage: "open <id>", description: "Expand a project by ID" },
             { name: "contact", action: "contact", description: "Open contact section" },
             { name: "theme", action: "theme", usage: "theme <dark|light>", description: "Change appearance" },
-            { name: "lang", action: "lang", usage: "lang <ar|en>", description: "Change language" },
+            { name: "lang", action: "lang", usage: "lang <ar|en|ku>", description: "Change language" },
             { name: "clear", action: "clear", description: "Clear console output" },
             { name: "neofetch", action: "neofetch", description: "Show browser information" },
             { name: "history", action: "history", description: "Show commands in this session" },
@@ -186,48 +185,109 @@ window.PORTFOLIO_DATA = {
           updated: "Updated",
         },
         spec: [
-          ["ROLE", "Systems Engineering Student", "layers"],
-          ["FOCUS", "Android / Kotlin / Compose", "android"],
+          ["ROLE", "Computer Systems Engineer", "layers"],
+          ["ANDROID", "Kotlin / Jetpack Compose", "android"],
+          ["WEB", "Full-Stack · Backend / Frontend", "terminal"],
           ["SYSTEMS", "C++ / Linux", "chip"],
-          ["BASED IN", "Amman, Jordan", "location"],
+          ["BASED IN", "Al-Hasakah, Syria", "location"],
         ],
       },
       about: {
         index: "01 / ABOUT",
-        title: "A systems-first perspective",
-        sampleLabel: "SAMPLE CONTENT",
+        title: "Computer Systems Engineering",
+        description:
+          "Android development, full-stack web development, systems programming, and ICDL training.",
+        sampleLabel: "",
         circuitLabel: "Simplified systems circuit diagram",
-        activityLabel: "Contribution activity over the last 52 weeks",
-        activityHeading: "SAMPLE ACTIVITY / LAST 52 WEEKS",
-        metricSampleLabel: "SAMPLE",
-        // PLACEHOLDER: Deterministic generated activity levels are for visual demonstration only.
-        activitySeed: 27,
+        metricSampleLabel: "",
         paragraphs: [
-          "I am a Computer Systems Engineering student who enjoys turning practical problems into small, maintainable Android applications.",
-          "Alongside Kotlin development, I study computer architecture, Linux, and C++ to better understand the layers beneath an app.",
+          "I am a Computer Systems Engineer with five years of technical experience in Android application development and full-stack web development across backend and frontend. I am also an ICDL Trainer.",
         ],
-        // PLACEHOLDER: Example-only figures; replace with accurate personal numbers before publishing.
         metrics: [
-          { label: "YEARS BUILDING PROJECTS", value: 2, suffix: "+" },
-          { label: "PROJECTS", value: 3, suffix: "" },
+          { label: "YEARS OF EXPERIENCE", value: 5, suffix: "" },
         ],
       },
       skills: {
         index: "02 / SKILLS",
-        title: "Technical toolkit",
-        sampleLabel: "SAMPLE SKILLS",
+        title: "Technical skills",
+        description: "Skills grouped by engineering discipline.",
+        placeholderLabel: "PLACEHOLDER",
+        sampleLabel: "",
         groups: [
-          { name: "Languages", items: ["Kotlin", "C++", "C", "Bash", "JavaScript"] },
-          { name: "Platforms", items: ["Android", "Linux"] },
           {
-            name: "Tools",
-            items: ["Jetpack Compose", "Room", "Coroutines", "Git", "CMake"],
+            name: "Android",
+            category: "android",
+            icon: "android",
+            items: [
+              { name: "Kotlin", icon: "kotlin" },
+              { name: "Jetpack Compose", icon: "compose" },
+            ],
+          },
+          {
+            name: "Backend",
+            category: "web",
+            icon: "backend",
+            items: [
+              { name: "Backend", icon: "backend" },
+              { name: "APIs", icon: "api", placeholder: true },
+              { name: "Databases", icon: "database", placeholder: true },
+            ],
+          },
+          {
+            name: "Frontend",
+            category: "web",
+            icon: "frontend",
+            items: [
+              { name: "HTML", icon: "html" },
+              { name: "CSS", icon: "css" },
+              { name: "JavaScript", icon: "javascript" },
+              { name: "UI/UX", icon: "uiux", placeholder: true },
+            ],
+          },
+          {
+            name: "Systems",
+            category: "systems",
+            icon: "chip",
+            items: [
+              { name: "C/C++", icon: "code" },
+              { name: "Linux", icon: "linux" },
+              { name: "Operating Systems", icon: "layers", placeholder: true },
+            ],
+          },
+          {
+            name: "Git / GitHub",
+            category: "systems",
+            icon: "github",
+            items: [{ name: "GitHub", icon: "github" }],
           },
         ],
+      },
+      credentials: {
+        title: "Languages & Certifications",
+        description: "Spoken languages and ICDL training.",
+        placeholderLabel: "PLACEHOLDER",
+        icon: "globe",
+        rows: [
+          { name: "Kurdish", level: "Native" },
+          { name: "Arabic", level: "Fluent" },
+          { name: "English", level: "Fluent" },
+        ],
+        trainer: {
+          title: "ICDL Trainer",
+          description: "ICDL training.",
+          yearsLabel: "Training years",
+          coursesLabel: "Courses delivered",
+          placeholderLabel: "PLACEHOLDER",
+          years: "", // PLACEHOLDER
+          courses: "", // PLACEHOLDER
+          icon: "training",
+        },
       },
       projects: {
         index: "03 / PROJECTS",
         title: "Selected work",
+        description: "Public work and clearly labeled sample projects.",
+        icon: "layers",
         columns: {
           name: "PROJECT",
           type: "TYPE",
@@ -251,6 +311,27 @@ window.PORTFOLIO_DATA = {
         },
         items: [
           {
+            id: "portfolio",
+            name: "Portfolio website",
+            type: "Web",
+            category: "web",
+            lifecycle: "active",
+            sample: false,
+            technologies: ["HTML", "CSS", "Vanilla JavaScript"],
+            architecture: ["HTML", "CSS", "Vanilla JavaScript"],
+            previewLines: ["Jemal Aziz", "Computer Systems Engineer", "HTML / CSS / JavaScript"],
+            loc: "n/a",
+            year: "2026",
+            status: "Public repository",
+            description:
+              "Personal portfolio website built with HTML, CSS, and vanilla JavaScript.",
+            repository: "JemalAziz22/portfolio",
+            codeUrl: "https://github.com/JemalAziz22/portfolio",
+            liveUrl: "",
+            // PLACEHOLDER: GitHub statistics load from the public repository API.
+            fallbackStats: { stars: "n/a", forks: "n/a" },
+          },
+          {
             id: "daymark",
             name: "Daymark — Task Planner",
             type: "Android",
@@ -258,7 +339,7 @@ window.PORTFOLIO_DATA = {
             lifecycle: "active",
             technologies: ["Kotlin", "Compose", "Room", "Coroutines"],
             architecture: ["Compose UI", "ViewModel", "Room"],
-            previewLines: ["Good morning, Omar", "3 tasks today", "Review architecture notes"],
+            previewLines: ["Good morning, Jemal", "3 tasks today", "Review architecture notes"],
             loc: "1.2k",
             year: "2026",
             status: "Prototype",
@@ -315,13 +396,16 @@ window.PORTFOLIO_DATA = {
       contact: {
         index: "04 / CONTACT",
         title: "Start a conversation",
-        socialLabel: "Contact links",
+        headingDescription: "Contact for project enquiries and technical discussions.",
         description:
           "For project enquiries, collaboration, or technical discussions, send a message below.",
+        socialLabel: "Contact links",
+        locationLabel: "Based in",
+        location: "Al-Hasakah, Syria",
         links: {
-          // PLACEHOLDER: Add verified public profile URLs.
+          // PLACEHOLDER: Add a verified email address and LinkedIn profile.
           email: { label: "Email", href: "" },
-          github: { label: "GitHub", href: "" },
+          github: { label: "GitHub", href: "https://github.com/JemalAziz22" },
           linkedin: { label: "LinkedIn", href: "" },
         },
         responseTime: {
@@ -340,21 +424,22 @@ window.PORTFOLIO_DATA = {
           setup: "Add your Web3Forms access key in data/data.js to enable sending.",
         },
       },
-      footer: { copyright: "© 2026 Omar Khalil", version: "v1.0" },
+      footer: { copyright: "© 2026 Jemal Aziz", version: "v1.0" },
     },
     ar: {
       direction: "rtl",
-      documentTitle: "عمر خليل — مهندس أنظمة ومطوّر Android",
+      documentTitle: "جمال عزيز — مهندس نظم حاسوب · مطوّر Android وويب Full-Stack",
       description:
-        "ملف أعمال عمر خليل، طالب هندسة أنظمة حاسوب يستكشف تطوير Android وبرمجة الأنظمة منخفضة المستوى.",
+        "جمال عزيز مهندس نظم حاسوب ومدرّب ICDL ومطوّر تطبيقات Android ومطوّر ويب Full-Stack، يقيم في الحسكة، سوريا.",
       status: {
         regionLabel: "حالة الملف الشخصي",
-        name: "عمر خليل",
+        name: "جمال عزيز",
         locationLabel: "الموقع",
-        location: "عمّان، الأردن",
+        location: "الحسكة، سوريا",
         localTimeLabel: "التوقيت المحلي",
-        availabilitySampleLabel: "تجريبي",
-        available: "متاح للتدريب",
+        // PLACEHOLDER: استبدل حالة التوفر المحايدة بالحالة الحالية بعد التحقق منها.
+        availabilitySampleLabel: "نص مؤقت",
+        available: "متاح للعمل",
       },
       skipLink: "انتقل إلى المحتوى",
       navigation: {
@@ -379,30 +464,28 @@ window.PORTFOLIO_DATA = {
         darkMode: "داكن",
       },
       hero: {
-        eyebrow: "هندسة الأنظمة / أندرويد",
-        sampleLabel: "نص تجريبي",
-        title: "مهندس بعقلية الأنظمة. مطوّر أندرويد.",
+        eyebrow: "نظم الحاسوب / أندرويد / ويب Full-Stack",
+        sampleLabel: "",
+        title: "مهندس نظم حاسوب · مطوّر Android · مطوّر ويب Full-Stack",
         titleParts: [
-          { text: "مهندس بعقلية الأنظمة. " },
-          { text: "مطوّر أندرويد.", accent: true },
+          { text: "مهندس نظم حاسوب · " },
+          { text: "مطوّر Android · مطوّر ويب Full-Stack", accent: true },
         ],
         description:
-          "طالب هندسة أنظمة حاسوب يبني تطبيقات Android باستخدام Kotlin، ويستكشف تفاعل البرمجيات مع العتاد عبر C++ وLinux ومشاريع الأنظمة.",
+          "مهندس نظم حاسوب بخبرة تقنية تمتد لخمس سنوات، يطوّر تطبيقات Android وتطبيقات ويب متكاملة تشمل الواجهة الأمامية والخلفية.",
         projectsLink: "استعرض المشاريع المختارة",
         contactLink: "تواصل معي",
         metrics: [
-          { label: "المشاريع", value: 3, suffix: "" },
-          { label: "سنوات تطوير", value: 2, suffix: "+" },
-          { label: "لغات أساسية", value: 4, suffix: "" },
+          { label: "سنوات الخبرة", value: 5, suffix: "" },
         ],
-        specLabel: "الملف / 0001",
+        specLabel: "الملف",
         identity: {
-          role: "طالب هندسة أنظمة · مطوّر Android",
-          id: "0001",
-          sampleLabel: "بيانات الملف / تجريبية",
-          imageAlt: "صورة شخصية لصاحب ملف الأعمال",
+          role: "مهندس نظم حاسوب · Android · ويب Full-Stack",
+          id: "",
+          sampleLabel: "",
+          imageAlt: "صورة جمال عزيز",
         },
-        metricSampleLabel: "تجريبي",
+        metricSampleLabel: "",
         diagramLabel: "مخطط معمارية نظام Android",
         architecture: [
           { id: "hardware", label: "العتاد" },
@@ -429,7 +512,7 @@ window.PORTFOLIO_DATA = {
             { name: "open", action: "open", usage: "open <id>", description: "فتح مشروع حسب المعرّف" },
             { name: "contact", action: "contact", description: "فتح قسم التواصل" },
             { name: "theme", action: "theme", usage: "theme <dark|light>", description: "تغيير المظهر" },
-            { name: "lang", action: "lang", usage: "lang <ar|en>", description: "تغيير اللغة" },
+            { name: "lang", action: "lang", usage: "lang <ar|en|ku>", description: "تغيير اللغة" },
             { name: "clear", action: "clear", description: "مسح مخرجات الطرفية" },
             { name: "neofetch", action: "neofetch", description: "عرض معلومات المتصفح" },
             { name: "history", action: "history", description: "عرض أوامر الجلسة" },
@@ -509,48 +592,108 @@ window.PORTFOLIO_DATA = {
           updated: "آخر تحديث",
         },
         spec: [
-          ["الدور", "طالب هندسة أنظمة حاسوب", "layers"],
-          ["التخصص", "Android / Kotlin / Compose", "android"],
+          ["الدور", "مهندس نظم حاسوب", "layers"],
+          ["Android", "Kotlin / Jetpack Compose", "android"],
+          ["الويب", "Full-Stack · Backend / Frontend", "terminal"],
           ["الأنظمة", "C++ / Linux", "chip"],
-          ["الموقع", "عمّان، الأردن", "location"],
+          ["الموقع", "الحسكة، سوريا", "location"],
         ],
       },
       about: {
         index: "01 / عنّي",
-        title: "منظور يبدأ من الأنظمة",
-        sampleLabel: "محتوى تجريبي",
+        title: "هندسة نظم الحاسوب",
+        description: "تطوير Android والويب المتكامل والأنظمة، إلى جانب تدريب ICDL.",
+        sampleLabel: "",
         circuitLabel: "رسم مبسّط لدائرة أنظمة",
-        activityLabel: "مخطط نشاط توضيحي خلال آخر 52 أسبوعًا",
-        activityHeading: "نشاط تجريبي / آخر 52 أسبوعًا",
-        metricSampleLabel: "تجريبي",
-        // PLACEHOLDER: مستويات النشاط المولّدة ثابتة للتوضيح البصري فقط.
-        activitySeed: 27,
+        metricSampleLabel: "",
         paragraphs: [
-          "أنا طالب هندسة أنظمة حاسوب أستمتع بتحويل المشكلات العملية إلى تطبيقات Android صغيرة وسهلة الصيانة.",
-          "إلى جانب تطوير Kotlin، أدرس معمارية الحاسوب وLinux وC++ لفهم الطبقات التي تعمل أسفل التطبيق.",
+          "أنا مهندس نظم حاسوب بخبرة تقنية تمتد لخمس سنوات في تطوير تطبيقات Android وتطوير الويب Full-Stack للواجهة الأمامية والخلفية. كما أعمل مدرّب ICDL.",
         ],
-        // PLACEHOLDER: أرقام توضيحية فقط؛ استبدلها بأرقامك الدقيقة قبل النشر.
         metrics: [
-          { label: "سنوات تطوير المشاريع", value: 2, suffix: "+" },
-          { label: "المشاريع", value: 3, suffix: "" },
+          { label: "سنوات الخبرة", value: 5, suffix: "" },
         ],
       },
       skills: {
         index: "02 / المهارات",
-        title: "الأدوات التقنية",
-        sampleLabel: "مهارات تجريبية",
+        title: "المهارات التقنية",
+        description: "مهارات مرتبة حسب التخصص الهندسي.",
+        placeholderLabel: "نص مؤقت",
+        sampleLabel: "",
         groups: [
-          { name: "لغات البرمجة", items: ["Kotlin", "C++", "C", "Bash", "JavaScript"] },
-          { name: "المنصات", items: ["Android", "Linux"] },
           {
-            name: "الأدوات",
-            items: ["Jetpack Compose", "Room", "Coroutines", "Git", "CMake"],
+            name: "Android",
+            category: "android",
+            icon: "android",
+            items: [
+              { name: "Kotlin", icon: "kotlin" },
+              { name: "Jetpack Compose", icon: "compose" },
+            ],
+          },
+          {
+            name: "Backend",
+            category: "web",
+            icon: "backend",
+            items: [
+              { name: "Backend", icon: "backend" },
+              { name: "APIs", icon: "api", placeholder: true },
+              { name: "Databases", icon: "database", placeholder: true },
+            ],
+          },
+          {
+            name: "Frontend",
+            category: "web",
+            icon: "frontend",
+            items: [
+              { name: "HTML", icon: "html" },
+              { name: "CSS", icon: "css" },
+              { name: "JavaScript", icon: "javascript" },
+              { name: "UI/UX", icon: "uiux", placeholder: true },
+            ],
+          },
+          {
+            name: "الأنظمة",
+            category: "systems",
+            icon: "chip",
+            items: [
+              { name: "C/C++", icon: "code" },
+              { name: "Linux", icon: "linux" },
+              { name: "Operating Systems", icon: "layers", placeholder: true },
+            ],
+          },
+          {
+            name: "Git / GitHub",
+            category: "systems",
+            icon: "github",
+            items: [{ name: "GitHub", icon: "github" }],
           },
         ],
+      },
+      credentials: {
+        title: "اللغات والشهادات",
+        description: "اللغات التي أتحدث بها وتدريب ICDL.",
+        placeholderLabel: "نص مؤقت",
+        icon: "globe",
+        rows: [
+          { name: "الكردية", level: "لغة الأم" },
+          { name: "العربية", level: "إتقان" },
+          { name: "الإنجليزية", level: "إتقان" },
+        ],
+        trainer: {
+          title: "مدرّب ICDL",
+          description: "التدريب على ICDL.",
+          yearsLabel: "سنوات التدريب",
+          coursesLabel: "عدد الدورات",
+          placeholderLabel: "نص مؤقت",
+          years: "", // PLACEHOLDER
+          courses: "", // PLACEHOLDER
+          icon: "training",
+        },
       },
       projects: {
         index: "03 / المشاريع",
         title: "أعمال مختارة",
+        description: "أعمال عامة ومشاريع توضيحية موسومة بوضوح.",
+        icon: "layers",
         columns: {
           name: "المشروع",
           type: "النوع",
@@ -574,6 +717,27 @@ window.PORTFOLIO_DATA = {
         },
         items: [
           {
+            id: "portfolio",
+            name: "موقع الملف الشخصي",
+            type: "Web",
+            category: "web",
+            lifecycle: "active",
+            sample: false,
+            technologies: ["HTML", "CSS", "Vanilla JavaScript"],
+            architecture: ["HTML", "CSS", "Vanilla JavaScript"],
+            previewLines: ["جمال عزيز", "مهندس نظم حاسوب", "HTML / CSS / JavaScript"],
+            loc: "غير متاح",
+            year: "2026",
+            status: "مستودع عام",
+            description:
+              "موقع الملف الشخصي مبني باستخدام HTML وCSS وVanilla JavaScript.",
+            repository: "JemalAziz22/portfolio",
+            codeUrl: "https://github.com/JemalAziz22/portfolio",
+            liveUrl: "",
+            // PLACEHOLDER: تُجلب إحصاءات GitHub من واجهة المستودع العام.
+            fallbackStats: { stars: "غير متاح", forks: "غير متاح" },
+          },
+          {
             id: "daymark",
             name: "Daymark — مخطّط المهام",
             type: "Android",
@@ -581,7 +745,7 @@ window.PORTFOLIO_DATA = {
             lifecycle: "active",
             technologies: ["Kotlin", "Compose", "Room", "Coroutines"],
             architecture: ["واجهة Compose", "ViewModel", "Room"],
-            previewLines: ["صباح الخير، عمر", "3 مهام اليوم", "مراجعة ملاحظات المعمارية"],
+            previewLines: ["صباح الخير، جمال", "3 مهام اليوم", "مراجعة ملاحظات المعمارية"],
             loc: "1.2k",
             year: "2026",
             status: "نموذج أولي",
@@ -638,13 +802,16 @@ window.PORTFOLIO_DATA = {
       contact: {
         index: "04 / التواصل",
         title: "لنبدأ حوارًا",
-        socialLabel: "روابط التواصل",
+        headingDescription: "للاستفسارات عن المشاريع والنقاشات التقنية.",
         description:
           "للاستفسار عن مشروع أو التعاون أو النقاشات التقنية، أرسل رسالة عبر النموذج.",
+        socialLabel: "روابط التواصل",
+        locationLabel: "الموقع",
+        location: "الحسكة، سوريا",
         links: {
-          // PLACEHOLDER: Add verified public profile URLs.
+          // PLACEHOLDER: أضف البريد الإلكتروني ورابط LinkedIn بعد التحقق منهما.
           email: { label: "البريد الإلكتروني", href: "" },
-          github: { label: "GitHub", href: "" },
+          github: { label: "GitHub", href: "https://github.com/JemalAziz22" },
           linkedin: { label: "LinkedIn", href: "" },
         },
         responseTime: {
@@ -663,7 +830,373 @@ window.PORTFOLIO_DATA = {
           setup: "أضف مفتاح Web3Forms في data/data.js لتفعيل الإرسال.",
         },
       },
-      footer: { copyright: "© 2026 عمر خليل", version: "v1.0" },
+      footer: { copyright: "© 2026 جمال عزيز", version: "v1.0" },
     },
   },
 };
+
+const kurmanji = JSON.parse(
+  JSON.stringify(window.PORTFOLIO_DATA.locales.en),
+);
+Object.assign(kurmanji, {
+  direction: "ltr",
+  documentTitle:
+    "Jemal Aziz — Endezyarê Sîstemên Komputerê · Pêşdebirê Android û Web-ê Full-Stack",
+  description:
+    "Jemal Aziz endezyarê sîstemên komputerê, mamosteyê ICDL, pêşdebirê sepanên Android û pêşdebirê Web-ê Full-Stack e; li Hesîçe, Sûriyê dijî.",
+  status: {
+    ...kurmanji.status,
+    regionLabel: "Rewşa kesane",
+    locationLabel: "CIH",
+    location: "Hesîçe, Sûriye",
+    localTimeLabel: "DEMA HERÊMÎ",
+    availabilitySampleLabel: "NIVÎSARA DEMKÎ",
+    available: "Ji bo karê amade",
+  },
+  skipLink: "Derbasî naverokê bibe",
+  navigation: {
+    label: "Navîgasyon",
+    about: "Derbarê min",
+    skills: "Şiyan",
+    projects: "Proje",
+    contact: "Têkilî",
+  },
+  live: {
+    ...kurmanji.live,
+    uptimeLabel: "DEMA XEBATÊ",
+    scrollLabel: "Pêşketina scrollê",
+    backToTop: "Vegere serê rûpelê",
+    footerBuild: "Bi HTML / CSS / JS hatiye çêkirin",
+  },
+  controls: {
+    ...kurmanji.controls,
+    languageLabel: "Zimanê biguherîne",
+    languageTarget: "English",
+    localeCode: "KU",
+    themeLabel: "Dîtina ronahî biguherîne",
+    lightMode: "RONAHÎ",
+    darkMode: "TARÎ",
+  },
+});
+
+kurmanji.hero = {
+  ...kurmanji.hero,
+  eyebrow: "SÎSTEMÊN KOMPUTERÊ / ANDROID / WEB-Ê FULL-STACK",
+  title: "Endezyarê Sîstemên Komputerê · Pêşdebirê Android · Pêşdebirê Web-ê Full-Stack",
+  titleParts: [
+    { text: "Endezyarê Sîstemên Komputerê · " },
+    { text: "Pêşdebirê Android · Pêşdebirê Web-ê Full-Stack", accent: true },
+  ],
+  description:
+    "Endezyarê sîstemên komputerê bi pênc sal tecrubeya teknîkî; sepanên Android û sepanên Web-ê Full-Stack ji alîyê Backend û Frontend ve pêş dixe.",
+  projectsLink: "Proje bibîne",
+  contactLink: "Têkilî",
+  metrics: [{ label: "SALÊN TECRÛBEYÊ", value: 5, suffix: "" }],
+  specLabel: "PROFÎL",
+  identity: {
+    ...kurmanji.hero.identity,
+    role: "Endezyarê Sîstemên Komputerê · Android · Web-ê Full-Stack",
+    sampleLabel: "",
+    imageAlt: "Wêneyê Jemal Aziz",
+  },
+  metricSampleLabel: "",
+  diagramLabel: "Nexşeya mîmariya pergala Android",
+  architecture: [
+    { id: "hardware", label: "Hardware" },
+    { id: "kernel", label: "Kernel" },
+    { id: "drivers", label: "Drivers" },
+    { id: "runtime", label: "Android Runtime" },
+    { id: "app", label: "App" },
+  ],
+};
+
+Object.assign(kurmanji.hero.terminal, {
+  label: "TERMÎNAL / DANÎŞÎNA 01",
+  windowTitle: "portfolio-shell",
+  prompt: "visitor@portfolio:~$",
+  tabs: { console: "Console", monitor: "Monitor", logcat: "Logcat" },
+  inputLabel: "Fermana termînalê",
+  inputPlaceholder: "Fermanek binivîse…",
+  runLabel: "Bixebitîne",
+  quickCommandsLabel: "Fermanên bilez",
+  commands: [
+    { name: "help", action: "help", description: "Fermanên berdest nîşan bide" },
+    { name: "about", action: "about", description: "Kurteya profîlê nîşan bide" },
+    { name: "skills", action: "skills", description: "Şiyanên teknîkî nîşan bide" },
+    { name: "projects", action: "projects", description: "Proje hilbijartî veke" },
+    { name: "open", action: "open", usage: "open <id>", description: "Projeyekê bi ID veke" },
+    { name: "contact", action: "contact", description: "Beşa têkiliyê veke" },
+    { name: "theme", action: "theme", usage: "theme <dark|light>", description: "Dîtinê biguherîne" },
+    { name: "lang", action: "lang", usage: "lang <ar|en|ku>", description: "Zimanê biguherîne" },
+    { name: "clear", action: "clear", description: "Derketinê paqij bike" },
+    { name: "neofetch", action: "neofetch", description: "Agahiyên gerokê nîşan bide" },
+    { name: "history", action: "history", description: "Fermanên vê danişînê nîşan bide" },
+  ],
+});
+
+Object.assign(kurmanji.hero.terminal.text, {
+  helpHeading: "Fermanên berdest",
+  ready: "Ji bo dîtina fermanan help binivîse.",
+  unknownCommand: "Fermana nenas: {command}. Ji bo lîsteyê help binivîse.",
+  missingArgument: "Bikaranîn: {usage}",
+  projectMissing: "Proje nehat dîtin: {id}",
+  projectOpened: "Proje hat vekirin: {name}",
+  themeChanged: "Dîtin hate guhertin bo {theme}",
+  languageChanged: "Ziman hate guhertin bo {language}",
+  consoleCleared: "Termînal hate paqijkirin.",
+  historyEmpty: "Di vê danişînê de ferman tune ne.",
+  profileHeading: "Profîl",
+  skillsHeading: "Şiyan",
+  projectsHeading: "Proje",
+  contactOpened: "Beşa têkiliyê hate vekirin.",
+  neofetchHeading: "Danişîna gerokê",
+  userAgent: "Nasnameya gerokê",
+  language: "Ziman",
+  screen: "Dîmender",
+  cores: "Rêzikên processorê",
+  memory: "Bîra amûrê",
+  connection: "Girêdan",
+  notAvailable: "Nîne",
+  commandRun: "Ferman hat meşandin: {command}",
+  pageLoaded: "Portfolio hate barkirin",
+  themeEvent: "Dîtin hate guhertin bo {theme}",
+  languageEvent: "Ziman hate guhertin bo {language}",
+  sectionEvent: "Beş hate vekirin: {section}",
+  projectEvent: "Proje hate vekirin: {name}",
+  formSubmitted: "Forma têkiliyê hate şandin",
+  formSucceeded: "Peyam hate şandin",
+  formFailed: "Şandina formê bi ser neket",
+  githubUnavailable: "Agahiyên GitHub nehatin wergirtin",
+  logFilter: "Parzûna asta logê",
+  logClear: "Logê paqij bike",
+  logLevels: {
+    ALL: "Hemû ast",
+    I: "Agahî",
+    D: "Rastkirin",
+    W: "Hişyarî",
+    E: "Çewtî",
+  },
+  allLevels: "Hemû",
+  sampleFallbackLabel: "NIMÛNE",
+  sampleFallbackTitle: "Nûkirina GitHub ya nimûne",
+  sampleFallbackMessage: "Li şûna vê nimûneyê commiteke giştî ya rastîn danê.",
+  githubMissing: "Ji bo çalakiyê github.username di data/data.js de saz bike.",
+  noPublicActivity: "Commiteke giştî ya nêzîk nehat dîtin.",
+  relativeNow: "niha",
+  relativeMinutes: "{count} deq berê",
+  relativeHours: "{count} saet berê",
+  relativeDays: "{count} roj berê",
+});
+
+Object.assign(kurmanji.hero.monitor, {
+  title: "GEROKA TE",
+  liveLabel: "DANIŞÎNA HERÊMÎ",
+  labels: { fps: "RÊJeya FRAME", memory: "BÎRA JS", network: "TOR" },
+  units: { fps: "fps", memory: "MB", network: "Mb/s" },
+  latencyLabel: "RTT",
+  pageLoadLabel: "BARKIRINA RÛPELÊ",
+});
+
+Object.assign(kurmanji.hero.now, {
+  label: "GITHUB / NIHA",
+  status: "ÇALAKIYA GIŞTÎ",
+  loading: "Çalakiya giştî tê kontrolkirin…",
+  missingUsername: "Ji bo çalakiya giştî github.username di data/data.js de saz bike.",
+  unavailable: "Çalakiya GitHub nîne.",
+  sampleStatus: "NIMÛNE",
+  sampleTitle: "Nûkirina GitHub ya nimûne",
+  sampleMessage: "Li şûna vê nimûneyê commiteke giştî ya rastîn danê.",
+  updated: "Nûkirin",
+});
+
+kurmanji.hero.spec = [
+  ["ROL", "Endezyarê Sîstemên Komputerê", "layers"],
+  ["ANDROID", "Kotlin / Jetpack Compose", "android"],
+  ["WEB", "Full-Stack · Backend / Frontend", "terminal"],
+  ["SÎSTEM", "C++ / Linux", "chip"],
+  ["CIH", "Hesîçe, Sûriye", "location"],
+];
+
+Object.assign(kurmanji.about, {
+  index: "01 / DERBARÊ MIN",
+  title: "Endezyariya Sîstemên Komputerê",
+  description: "Pêşxistina Android û Web-ê Full-Stack, sîstem û perwerdehiya ICDL.",
+  sampleLabel: "",
+  circuitLabel: "Nexşeya hêsan a çerxa sîstemê",
+  metricSampleLabel: "",
+  paragraphs: [
+    "Ez endezyarê sîstemên komputerê me û pênc sal tecrubeya teknîkî di pêşxistina sepanên Android û Web-ê Full-Stack ji bo Backend û Frontend de heye. Her wiha mamosteyê ICDL me.",
+  ],
+  metrics: [{ label: "SALÊN TECRÛBEYÊ", value: 5, suffix: "" }],
+});
+
+Object.assign(kurmanji.skills, {
+  index: "02 / ŞIYAN",
+  title: "Şiyanên teknîkî",
+  description: "Şiyan li gorî warên endezyariyê hatine rêzkirin.",
+  placeholderLabel: "NIVÎSA DEMKÎ",
+  sampleLabel: "",
+  groups: [
+    {
+      name: "Android",
+      category: "android",
+      icon: "android",
+      items: [
+        { name: "Kotlin", icon: "kotlin" },
+        { name: "Jetpack Compose", icon: "compose" },
+      ],
+    },
+    {
+      name: "Backend",
+      category: "web",
+      icon: "backend",
+      items: [
+        { name: "Backend", icon: "backend" },
+        { name: "APIs", icon: "api", placeholder: true },
+        { name: "Databases", icon: "database", placeholder: true },
+      ],
+    },
+    {
+      name: "Frontend",
+      category: "web",
+      icon: "frontend",
+      items: [
+        { name: "HTML", icon: "html" },
+        { name: "CSS", icon: "css" },
+        { name: "JavaScript", icon: "javascript" },
+        { name: "UI/UX", icon: "uiux", placeholder: true },
+      ],
+    },
+    {
+      name: "Sîstem",
+      category: "systems",
+      icon: "chip",
+      items: [
+        { name: "C/C++", icon: "code" },
+        { name: "Linux", icon: "linux" },
+        { name: "Operating Systems", icon: "layers", placeholder: true },
+      ],
+    },
+    {
+      name: "Git / GitHub",
+      category: "systems",
+      icon: "github",
+      items: [{ name: "GitHub", icon: "github" }],
+    },
+  ],
+});
+
+kurmanji.credentials = {
+  title: "Ziman û Sertîfîka",
+  description: "Zimanên ku ez diaxivim û perwerdehiya ICDL.",
+  placeholderLabel: "NIVÎSA DEMKÎ",
+  icon: "globe",
+  rows: [
+    { name: "Kurdî", level: "Zimanê dayikê" },
+    { name: "Erebî", level: "Bi rewanî" },
+    { name: "Îngilîzî", level: "Bi rewanî" },
+  ],
+  trainer: {
+    title: "Mamosteyê ICDL",
+    description: "Perwerdehiya ICDL.",
+    yearsLabel: "Salên perwerdehiyê",
+    coursesLabel: "Hejmara kursan",
+    placeholderLabel: "NIVÎSA DEMKÎ",
+    years: "", // PLACEHOLDER
+    courses: "", // PLACEHOLDER
+    icon: "training",
+  },
+};
+
+Object.assign(kurmanji.projects, {
+  index: "03 / PROJE",
+  title: "Karên hilbijartî",
+  description: "Karên giştî û projeyên nimûne yên bi zelalî hatine nîşankirin.",
+  icon: "layers",
+  columns: {
+    name: "PROJE",
+    type: "CURE",
+    technologies: "TEKNOLOJÎ",
+    year: "SAL",
+    status: "REWŞ",
+  },
+  stats: { stars: "STÊR", forks: "FORK", loc: "RÊZ" },
+  sampleLabel: "PROJEYA NIMÛNE",
+  links: {
+    source: "Çavkanî",
+    live: "Zindî",
+    sourcePending: "Çavkanî tune",
+    livePending: "Pêşandana zindî tune",
+  },
+  architectureLabel: "Mîmariyê",
+  projectStates: { active: "ÇALAK", maintained: "TÊ PARASTIN", archived: "ARŞÎV KIRÎ" },
+  items: [
+    {
+      ...kurmanji.projects.items[0],
+      name: "Malpera portfolioyê",
+      type: "Web",
+      status: "Depoya giştî",
+      description: "Malpera portfolio ya kesane bi HTML, CSS û Vanilla JavaScript hatiye çêkirin.",
+      architecture: ["HTML", "CSS", "Vanilla JavaScript"],
+      previewLines: ["Jemal Aziz", "Endezyarê Sîstemên Komputerê", "HTML / CSS / JavaScript"],
+    },
+    {
+      ...kurmanji.projects.items[1],
+      name: "Daymark — Plankera karan",
+      previewLines: ["Roj baş, Jemal", "Îro 3 kar", "Nîşeyên mîmariyê binirxîne"],
+      status: "Prototîp",
+      description: "Nimûneyek plankera karan a herêmî bi lîsteyên rojane, hilanîna Room û rûyekî hêsan ê Compose.",
+    },
+    {
+      ...kurmanji.projects.items[2],
+      name: "Procscope — Lêgerê pêvajoyan",
+      type: "Sîstem",
+      status: "Projeya xwendinê",
+      description: "Projeyeke nimûne ya rêza fermanê ji bo lêkolîna agahiyên pêvajoyan û bîrê di Linux de.",
+    },
+    {
+      ...kurmanji.projects.items[3],
+      name: "Pulseboard — Konsola runtime",
+      type: "Web",
+      status: "Nimûne",
+      description: "Nimûneyeke dashboardê di gerokê de bi nexşeyên SVG û dîtina rewşê ya bersivdar.",
+    },
+  ],
+});
+kurmanji.projects.items.forEach((project) => {
+  project.fallbackStats = { stars: "Nîne", forks: "Nîne" };
+});
+
+Object.assign(kurmanji.contact, {
+  index: "04 / TÊKILÎ",
+  title: "Têkilî dayne",
+  headingDescription: "Ji bo pirsên projeyê û nîqaşên teknîkî têkilî dayne.",
+  description: "Ji bo pirsên projeyê, hevkariyê an nîqaşên teknîkî peyamek bişîne.",
+  socialLabel: "Girêdanên têkiliyê",
+  locationLabel: "Cih",
+  location: "Hesîçe, Sûriye",
+  links: {
+    email: { label: "E-name", href: "" },
+    github: { label: "GitHub", href: "https://github.com/JemalAziz22" },
+    linkedin: { label: "LinkedIn", href: "" },
+  },
+  responseTime: { label: "DEMA BERSIVÊ", value: "Bi gelemperî di nav 2 rojan de" },
+  form: {
+    ...kurmanji.contact.form,
+    nameLabel: "NAV",
+    emailLabel: "E-NAME",
+    messageLabel: "PEYAM",
+    submit: "Peyamê bişîne",
+    sending: "Tê şandin…",
+    success: "Peyam hate şandin. Spas.",
+    error: "Peyam nehat şandin. Ji kerema xwe dîsa biceribîne.",
+    validationError: "Berî şandinê qadên nîşankirî kontrol bike.",
+    setup: "Ji bo çalakkirina şandinê mifteya Web3Forms di data/data.js de zêde bike.",
+  },
+});
+
+Object.assign(kurmanji.footer, {
+  copyright: "© 2026 Jemal Aziz",
+  version: "v1.0",
+});
+window.PORTFOLIO_DATA.locales.ku = kurmanji;

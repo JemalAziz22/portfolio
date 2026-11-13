@@ -40,6 +40,7 @@ function renderLogcat() {
       hour: "2-digit",
       minute: "2-digit",
       second: "2-digit",
+      timeZone: data.timeZone,
     }).format(entry.timestamp);
     const level = document.createElement("span");
     level.className = "log-level";
@@ -184,10 +185,10 @@ Object.entries(slots).forEach(([name, value]) => {
 
 const brand = document.querySelector(".status-name");
 const nameParts = content.status.name.trim().split(/\s+/).filter(Boolean);
-const monogram =
-  nameParts.length > 1
+const monogram = data.monogram ||
+  (nameParts.length > 1
     ? `${nameParts[0][0]}${nameParts[1][0]}`
-    : nameParts[0].slice(0, 2);
+    : nameParts[0].slice(0, 2));
 brand.setAttribute("aria-label", content.status.name);
 brand.innerHTML = `
   <svg class="brand-mark" viewBox="0 0 40 40" aria-hidden="true" focusable="false">
@@ -221,7 +222,7 @@ favicon.href = `data:image/svg+xml,${encodeURIComponent(faviconSvg)}`;
 
 document.querySelector('[data-slot="hero-copy"]').innerHTML = `
   <p class="hero-eyebrow">${content.hero.eyebrow}</p>
-  <span class="hero-sample-label">${content.hero.sampleLabel}</span>
+  ${content.hero.sampleLabel ? `<span class="hero-sample-label">${content.hero.sampleLabel}</span>` : ""}
   <h1 class="hero-title" id="hero-title">${content.hero.titleParts
     .map((part) => `<span${part.accent ? ' class="title-accent"' : ""}>${part.text}</span>`)
     .join("")}<span class="terminal-cursor" aria-hidden="true">_</span></h1>
@@ -236,7 +237,7 @@ document.querySelector('[data-slot="hero-copy"]').innerHTML = `
         (metric) => `
           <div class="hero-metric">
             <span class="hero-metric-value counter-value" data-count-target="${metric.value}" data-count-suffix="${metric.suffix}" aria-hidden="true">0${metric.suffix}</span>
-            <span class="hero-metric-label">${content.hero.metricSampleLabel} · ${metric.label}</span>
+            <span class="hero-metric-label">${content.hero.metricSampleLabel ? `${content.hero.metricSampleLabel} · ` : ""}${metric.label}</span>
           </div>
         `,
       )
@@ -314,8 +315,8 @@ document.querySelector('[data-slot="hero-spec"]').insertAdjacentHTML(
           <span>${content.status.available}</span>
         </p>
         <div class="profile-metadata">
-          <span class="profile-sample-label">${content.hero.identity.sampleLabel}</span>
-          <span class="profile-id">ID ${content.hero.identity.id}</span>
+          ${content.hero.identity.sampleLabel ? `<span class="profile-sample-label">${content.hero.identity.sampleLabel}</span>` : ""}
+          ${content.hero.identity.id ? `<span class="profile-id">ID ${content.hero.identity.id}</span>` : ""}
         </div>
       </div>
     </section>
@@ -978,8 +979,10 @@ const aboutSection = document.querySelector("#about");
 aboutSection.innerHTML = `
   <div class="section-heading">
     <p class="section-index">${content.about.index}</p>
-    <h2 class="section-title" id="about-title">${content.about.title}</h2>
-    <span class="content-sample-label">${content.about.sampleLabel}</span>
+    <div class="section-heading-main">
+      <h2 class="section-title" id="about-title"><svg class="icon section-icon" aria-hidden="true"><use href="assets/icons.svg#layers"></use></svg>${content.about.title}</h2>
+      <p class="section-description">${content.about.description}</p>
+    </div>
   </div>
   <div class="about-copy">
     ${content.about.paragraphs.map((paragraph) => `<p>${paragraph}</p>`).join("")}
@@ -1003,7 +1006,7 @@ aboutSection.innerHTML = `
         (metric) => `
           <div class="metric-item">
             <span class="metric-value counter-value" data-count-target="${metric.value}" data-count-suffix="${metric.suffix}" aria-hidden="true">0${metric.suffix}</span>
-            <span class="metric-label">${content.about.metricSampleLabel} · ${metric.label}</span>
+            <span class="metric-label">${content.about.metricSampleLabel ? `${content.about.metricSampleLabel} · ` : ""}${metric.label}</span>
             <span class="sr-only">${metric.label}: ${metric.value}${metric.suffix}</span>
           </div>
         `,
@@ -1012,63 +1015,50 @@ aboutSection.innerHTML = `
   </div>
 `;
 
-const activityHeading = content.about.activityHeading;
-const activitySeed = content.about.activitySeed;
-const activityCells = Array.from({ length: 52 * 7 }, (_, index) => {
-  const week = Math.floor(index / 7);
-  const day = index % 7;
-  const hash = Math.abs(
-    Math.sin((week + activitySeed) * 12.9898 + (day + 1) * 78.233) * 43758.5453,
-  );
-  const level = Math.floor((hash % 1) * 5);
-  return `<span class="activity-cell" data-level="${level}" style="--cell-delay:${index * 4}ms"></span>`;
-}).join("");
-aboutSection.querySelector(".metric-strip").insertAdjacentHTML(
-  "afterend",
-  `
-    <figure class="activity-panel" role="img" aria-label="${content.about.activityLabel}">
-      <figcaption class="activity-heading">${activityHeading}</figcaption>
-      <div class="activity-grid" aria-hidden="true">${activityCells}</div>
-      <p class="sr-only">${content.about.activityLabel}</p>
-    </figure>
-  `,
-);
-
 function createRuler() {
   const ticks = Array.from({ length: 101 }, (_, index) => {
     const x = index * 10;
     const height = index % 10 === 0 ? 10 : 4;
-    return `M${x} 0v${height}`;
+    return `M${x} ${6 - height / 2}v${height}`;
   }).join("");
 
   return `
     <svg class="section-ruler" viewBox="0 0 1000 12" preserveAspectRatio="none" aria-hidden="true" focusable="false">
-      <path class="draw-path ruler-track" d="M0 0h1000 ${ticks}"></path>
+      <path class="draw-path ruler-track" d="M0 6H1000${ticks}M0 2v8m-4-4h8m992 0h8m-4-4v8"></path>
     </svg>
   `;
 }
 
 const skillsSection = document.querySelector("#skills");
-const skillRows = content.skills.groups
+const skillGroups = content.skills.groups
   .map((group, groupIndex) => {
-    const category = ["language", "platform", "tool"][groupIndex] || "tool";
+    const category = group.category || "systems";
     return `
-      <tr>
-        <th scope="row">${group.name}</th>
-        <td>
-          <ul class="skill-list">
-            ${group.items
-              .map(
-                (skill) => `
-                  <li>
-                    <button class="skill-tag skill-tag--${category}" type="button" data-skill="${skill.toLowerCase()}" aria-pressed="false">${skill}</button>
-                  </li>
-                `,
-              )
-              .join("")}
-          </ul>
-        </td>
-      </tr>
+      <section class="skill-group skill-group--${category}" aria-labelledby="skill-group-${groupIndex}">
+        <h3 class="skill-group-title" id="skill-group-${groupIndex}">
+          <svg class="icon skill-group-icon" aria-hidden="true"><use href="assets/icons.svg#${group.icon}"></use></svg>
+          <span>${group.name}</span>
+        </h3>
+        <ul class="skill-list">
+          ${group.items
+            .map((skill) => {
+              const skillName = typeof skill === "string" ? skill : skill.name;
+              const skillIcon = typeof skill === "string" ? "code" : skill.icon;
+              const skillKey = skillName.toLowerCase();
+              const placeholder = typeof skill === "object" && skill.placeholder;
+              return `
+                <li>
+                  <button class="skill-tag skill-tag--${category}" type="button" data-skill="${skillKey}" aria-pressed="false"${placeholder ? ` aria-label="${skillName} — ${content.skills.placeholderLabel}"` : ""}>
+                    <svg class="icon" aria-hidden="true"><use href="assets/icons.svg#${skillIcon}"></use></svg>
+                    <span>${skillName}</span>
+                    ${placeholder ? `<small class="skill-placeholder">${content.skills.placeholderLabel}</small>` : ""}
+                  </button>
+                </li>
+              `;
+            })
+            .join("")}
+        </ul>
+      </section>
     `;
   })
   .join("");
@@ -1076,17 +1066,58 @@ const skillRows = content.skills.groups
 skillsSection.innerHTML = `
   <div class="section-heading">
     <p class="section-index">${content.skills.index}</p>
-    <h2 class="section-title" id="skills-title">${content.skills.title}</h2>
-    <span class="content-sample-label">${content.skills.sampleLabel}</span>
+    <div class="section-heading-main">
+      <h2 class="section-title" id="skills-title"><svg class="icon section-icon" aria-hidden="true"><use href="assets/icons.svg#chip"></use></svg>${content.skills.title}</h2>
+      <p class="section-description">${content.skills.description}</p>
+    </div>
   </div>
-  <table class="skill-table"><tbody>${skillRows}</tbody></table>
+  <div class="skill-matrix">${skillGroups}</div>
+  <div class="credentials-block">
+    <div class="credentials-heading">
+      <h3 class="skill-group-title">
+        <svg class="icon skill-group-icon" aria-hidden="true"><use href="assets/icons.svg#${content.credentials.icon}"></use></svg>
+        <span>${content.credentials.title}</span>
+      </h3>
+      <p class="section-description">${content.credentials.description}</p>
+    </div>
+    <table class="skill-table credential-table">
+      <tbody>
+        ${content.credentials.rows
+          .map(
+            (row) => `
+              <tr>
+                <th scope="row">${row.name}</th>
+                <td>${row.level}</td>
+              </tr>
+            `,
+          )
+          .join("")}
+      </tbody>
+    </table>
+    <article class="trainer-card skill-group--training">
+      <div class="trainer-heading">
+        <svg class="icon skill-group-icon" aria-hidden="true"><use href="assets/icons.svg#${content.credentials.trainer.icon}"></use></svg>
+        <div>
+          <h4>${content.credentials.trainer.title}</h4>
+          <p>${content.credentials.trainer.description}</p>
+        </div>
+      </div>
+      <dl class="trainer-stats">
+        <div><dt>${content.credentials.trainer.yearsLabel}</dt><dd>${content.credentials.trainer.years || content.credentials.trainer.placeholderLabel}</dd></div>
+        <div><dt>${content.credentials.trainer.coursesLabel}</dt><dd>${content.credentials.trainer.courses || content.credentials.trainer.placeholderLabel}</dd></div>
+      </dl>
+    </article>
+  </div>
 `;
 
 const projectsSection = content.projects;
 document.querySelector('[data-slot="projects-index"]').textContent =
   projectsSection.index;
-document.querySelector('[data-slot="projects-title"]').textContent =
-  projectsSection.title;
+document
+  .querySelector('[data-slot="projects-title"]')
+  .insertAdjacentText("beforeend", projectsSection.title);
+document.querySelector('[data-slot="projects-description"]').textContent =
+  projectsSection.description;
 
 const projectColumns = [
   projectsSection.columns.name,
@@ -1140,7 +1171,7 @@ projectList.innerHTML = projectsSection.items
         <details class="project-details" data-project-id="${project.id || index + 1}" data-project-name="${project.name}" data-category="${project.category}" data-lifecycle="${project.lifecycle}" data-technologies="${technologies}"${repository}>
           <summary class="project-row">
             <span class="project-number">${String(index + 1).padStart(2, "0")}</span>
-            <span class="project-name">${project.name}<span class="project-sample-tag">${projectsSection.sampleLabel}</span></span>
+            <span class="project-name">${project.name}${project.sample === false ? "" : `<span class="project-sample-tag">${projectsSection.sampleLabel}</span>`}</span>
             <span class="project-type">${project.type}</span>
             <span class="project-technologies">${project.technologies.join(" / ")}</span>
             <span class="project-year">${project.year}</span>
@@ -1194,11 +1225,17 @@ projectList.querySelectorAll(".project-details").forEach((project) => {
 
 let selectedSkill = "";
 const skillTags = [...document.querySelectorAll(".skill-tag")];
+skillTags.forEach((tag, index) => {
+  tag.style.setProperty("--skill-delay", `${index * 30}ms`);
+});
 
 function highlightSkillProjects(skill) {
   projectList.querySelectorAll(".project-details").forEach((project) => {
-    const skillAlias =
-      skill === "jetpack compose" ? "compose" : skill;
+    const skillAliases = {
+      "jetpack compose": "compose",
+      "c/c++": "c++",
+    };
+    const skillAlias = skillAliases[skill] || skill;
     const related = skill
       ? project.dataset.technologies.split("|").includes(skillAlias)
       : false;
@@ -1486,10 +1523,18 @@ loadRepositoryStats().catch((error) => {
 const contact = content.contact;
 document.querySelector('[data-slot="contact-index"]').textContent =
   contact.index;
-document.querySelector('[data-slot="contact-title"]').textContent =
-  contact.title;
+document
+  .querySelector('[data-slot="contact-title"]')
+  .insertAdjacentText("beforeend", contact.title);
+document.querySelector(
+  '[data-slot="contact-heading-description"]',
+).textContent = contact.headingDescription;
 document.querySelector('[data-slot="contact-description"]').textContent =
   contact.description;
+document.querySelector('[data-slot="contact-description"]').insertAdjacentHTML(
+  "afterend",
+  `<p class="contact-description">${contact.locationLabel}: ${contact.location}</p>`,
+);
 document.querySelector('[data-slot="contact-response"]').innerHTML = `
   <span class="response-label">${contact.responseTime.label}</span>
   <strong>${contact.responseTime.value}</strong>
@@ -1639,13 +1684,14 @@ function updateLocalTime() {
     hour: "2-digit",
     minute: "2-digit",
     second: "2-digit",
+    timeZone: data.timeZone,
   }).format(now);
 }
 
 updateLocalTime();
 
 const revealElements = document.querySelectorAll(
-  ".hero-copy, .profile-spec, .section-heading, .about-copy, .skill-table, .project-list, .contact-layout, .activity-panel",
+  ".hero-copy, .profile-spec, .section-heading, .about-copy, .skill-matrix, .skill-table, .trainer-card, .project-list, .contact-layout",
 );
 const sectionIndexLabels = document.querySelectorAll(".section-index");
 
@@ -1672,9 +1718,6 @@ function setFinalMotionState() {
   document
     .querySelectorAll(".architecture-figure, .circuit-figure")
     .forEach((figure) => figure.classList.add("labels-visible"));
-  document
-    .querySelectorAll(".activity-panel")
-    .forEach((panel) => panel.classList.add("is-visible"));
   revealElements.forEach((element) => element.classList.add("is-visible"));
   sectionIndexLabels.forEach((element) => element.classList.add("is-visible"));
   document.querySelectorAll("[data-count-target]").forEach((element) => {
@@ -1746,7 +1789,7 @@ function initializeDrawingsAndCounters() {
   }
 
   const drawingTargets = document.querySelectorAll(
-    ".architecture-figure, .circuit-figure, .section-ruler, .activity-panel",
+    ".architecture-figure, .circuit-figure, .section-ruler",
   );
   const drawingObserver = new IntersectionObserver(
     (entries, observer) => {
@@ -1756,11 +1799,7 @@ function initializeDrawingsAndCounters() {
         entry.target.querySelectorAll(".draw-path").forEach((path) => {
           path.classList.add("is-drawn");
         });
-        entry.target.classList.add(
-          entry.target.classList.contains("activity-panel")
-            ? "is-visible"
-            : "labels-visible",
-        );
+        entry.target.classList.add("labels-visible");
         observer.unobserve(entry.target);
       });
     },

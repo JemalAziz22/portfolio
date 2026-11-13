@@ -9,12 +9,16 @@
   --color-text: #e8ecf2;
   --color-muted: #98a4b5;
   --color-dim: #808da1;
-  --color-accent: #ffb020;
+  --color-accent: #60a5fa;
   --color-data: #38bdf8;
   --color-status: #34d399;
   --color-danger: #fb7185;
   --color-language: #a78bfa;
   --color-focus: #38bdf8;
+  --color-skill-android: var(--color-accent);
+  --color-skill-systems: var(--color-data);
+  --color-skill-web: var(--color-status);
+  --color-skill-training: var(--color-language);
 
   --font-mono: "JetBrains Mono", "IBM Plex Mono", monospace;
   --font-sans: "IBM Plex Sans", "IBM Plex Sans Arabic", sans-serif;
@@ -52,7 +56,7 @@
   --color-text: #17212d;
   --color-muted: #46576b;
   --color-dim: #596a7e;
-  --color-accent: #875000;
+  --color-accent: #1d4ed8;
   --color-data: #006a9b;
   --color-status: #087a51;
   --color-danger: #b42345;
@@ -72,7 +76,7 @@
     --color-text: #17212d;
     --color-muted: #46576b;
     --color-dim: #596a7e;
-    --color-accent: #875000;
+    --color-accent: #1d4ed8;
     --color-data: #006a9b;
     --color-status: #087a51;
     --color-danger: #b42345;
