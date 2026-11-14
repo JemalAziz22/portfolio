@@ -895,7 +895,7 @@ const skillGroups = content.skills.groups
                   <button class="skill-tag skill-tag--${category}" type="button" data-skill="${skillKey}" aria-pressed="false"${placeholder ? ` aria-label="${skillName} — ${content.skills.placeholderLabel}"` : ""}>
                     <svg class="icon" aria-hidden="true"><use href="assets/icons.svg#${skillIcon}"></use></svg>
                     <span>${skillName}</span>
-                    ${placeholder ? `<small class="skill-placeholder">${content.skills.placeholderLabel}</small>` : ""}
+                    ${placeholder && content.skills.placeholderLabel ? `<small class="skill-placeholder">${content.skills.placeholderLabel}</small>` : ""}
                   </button>
                 </li>
               `;
@@ -946,10 +946,14 @@ skillsSection.innerHTML = `
           <p>${content.credentials.trainer.description}</p>
         </div>
       </div>
-      <dl class="trainer-stats">
-        <div><dt>${content.credentials.trainer.yearsLabel}</dt><dd>${content.credentials.trainer.years || content.credentials.trainer.placeholderLabel}</dd></div>
-        <div><dt>${content.credentials.trainer.coursesLabel}</dt><dd>${content.credentials.trainer.courses || content.credentials.trainer.placeholderLabel}</dd></div>
-      </dl>
+      ${
+        content.credentials.trainer.years || content.credentials.trainer.courses
+          ? `<dl class="trainer-stats">
+              ${content.credentials.trainer.years ? `<div><dt>${content.credentials.trainer.yearsLabel}</dt><dd>${content.credentials.trainer.years}</dd></div>` : ""}
+              ${content.credentials.trainer.courses ? `<div><dt>${content.credentials.trainer.coursesLabel}</dt><dd>${content.credentials.trainer.courses}</dd></div>` : ""}
+            </dl>`
+          : ""
+      }
     </article>
   </div>
 `;

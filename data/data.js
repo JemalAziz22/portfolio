@@ -595,7 +595,6 @@ window.PORTFOLIO_DATA = {
         index: "02 / المهارات",
         title: "المهارات التقنية",
         description: "مهارات مرتبة حسب التخصص الهندسي.",
-        placeholderLabel: "نص مؤقت",
         sampleLabel: "",
         groups: [
           {
@@ -652,7 +651,6 @@ window.PORTFOLIO_DATA = {
       credentials: {
         title: "اللغات والشهادات",
         description: "اللغات التي أتحدث بها وتدريب ICDL.",
-        placeholderLabel: "نص مؤقت",
         icon: "globe",
         rows: [
           { name: "الكردية", level: "لغة الأم" },
@@ -664,7 +662,6 @@ window.PORTFOLIO_DATA = {
           description: "التدريب على ICDL.",
           yearsLabel: "سنوات التدريب",
           coursesLabel: "عدد الدورات",
-          placeholderLabel: "نص مؤقت",
           years: "", // PLACEHOLDER
           courses: "", // PLACEHOLDER
           icon: "training",
@@ -1022,7 +1019,6 @@ Object.assign(kurmanji.skills, {
   index: "02 / ŞIYAN",
   title: "Şiyanên teknîkî",
   description: "Şiyan li gorî warên endezyariyê hatine rêzkirin.",
-  placeholderLabel: "NIVÎSA DEMKÎ",
   sampleLabel: "",
   groups: [
     {
@@ -1080,7 +1076,6 @@ Object.assign(kurmanji.skills, {
 kurmanji.credentials = {
   title: "Ziman û Sertîfîka",
   description: "Zimanên ku ez diaxivim û perwerdehiya ICDL.",
-  placeholderLabel: "NIVÎSA DEMKÎ",
   icon: "globe",
   rows: [
     { name: "Kurdî", level: "Zimanê dayikê" },
@@ -1092,7 +1087,6 @@ kurmanji.credentials = {
     description: "Perwerdehiya ICDL.",
     yearsLabel: "Salên perwerdehiyê",
     coursesLabel: "Hejmara kursan",
-    placeholderLabel: "NIVÎSA DEMKÎ",
     years: "", // PLACEHOLDER
     courses: "", // PLACEHOLDER
     icon: "training",
