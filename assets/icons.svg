@@ -34,6 +34,21 @@
     <path d="M14 4h6v6m0-6-9 9"/>
     <path d="M18 13v6H4V5h6"/>
   </symbol>
+  <symbol id="copy" viewBox="0 0 24 24">
+    <rect x="8" y="8" width="12" height="12"/>
+    <path d="M16 8V4H4v12h4"/>
+  </symbol>
+  <symbol id="check" viewBox="0 0 24 24">
+    <path d="m4 12 5 5L20 6"/>
+  </symbol>
+  <symbol id="warning" viewBox="0 0 24 24">
+    <path d="M12 3 2.8 20h18.4L12 3Z"/>
+    <path d="M12 9v5m0 3v.01"/>
+  </symbol>
+  <symbol id="alert" viewBox="0 0 24 24">
+    <circle cx="12" cy="12" r="9"/>
+    <path d="M12 7v6m0 3v.01"/>
+  </symbol>
   <symbol id="arrow" viewBox="0 0 24 24">
     <path d="M4 12h15m-6-6 6 6-6 6"/>
   </symbol>

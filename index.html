@@ -109,7 +109,7 @@
         <ol class="project-list" data-slot="project-list"></ol>
       </section>
       <section id="contact" aria-labelledby="contact-title">
-        <div class="section-heading">
+        <div class="section-heading contact-heading">
           <p class="section-index" data-slot="contact-index"></p>
           <div class="section-heading-main">
             <h2 class="section-title" id="contact-title" data-slot="contact-title">
@@ -121,7 +121,12 @@
         <div class="contact-layout">
           <div class="contact-intro">
             <p class="contact-description" data-slot="contact-description"></p>
-            <aside class="response-time" data-slot="contact-response"></aside>
+            <ul class="contact-channels" data-slot="contact-channels"></ul>
+            <div class="contact-availability">
+              <span class="availability-indicator" aria-hidden="true"></span>
+              <span data-slot="contact-availability"></span>
+            </div>
+            <p class="response-time" data-slot="contact-response"></p>
           </div>
           <div data-slot="contact-form"></div>
         </div>

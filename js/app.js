@@ -223,9 +223,16 @@ favicon.href = `data:image/svg+xml,${encodeURIComponent(faviconSvg)}`;
 document.querySelector('[data-slot="hero-copy"]').innerHTML = `
   <p class="hero-eyebrow">${content.hero.eyebrow}</p>
   ${content.hero.sampleLabel ? `<span class="hero-sample-label">${content.hero.sampleLabel}</span>` : ""}
-  <h1 class="hero-title" id="hero-title">${content.hero.titleParts
-    .map((part) => `<span${part.accent ? ' class="title-accent"' : ""}>${part.text}</span>`)
-    .join("")}<span class="terminal-cursor" aria-hidden="true">_</span></h1>
+  <h1 class="hero-title" id="hero-title" aria-label="${content.hero.title}">
+    <span class="hero-title-rotator" aria-hidden="true">${content.hero.titleSlides
+      .map(
+        (title, index) => `
+          <span class="hero-title-slide${index === 0 ? " is-active" : ""}">
+            ${title}<span class="terminal-cursor">_</span>
+          </span>`,
+      )
+      .join("")}</span>
+  </h1>
   <p class="hero-description">${content.hero.description}</p>
   <div class="hero-actions">
     <a class="hero-link hero-link--primary" href="#projects">${content.hero.projectsLink}<svg class="icon" aria-hidden="true"><use href="assets/icons.svg#arrow"></use></svg></a>
@@ -244,6 +251,22 @@ document.querySelector('[data-slot="hero-copy"]').innerHTML = `
       .join("")}
   </div>
 `;
+
+const heroTitleSlides = [
+  ...document.querySelectorAll(".hero-title-slide"),
+];
+if (
+  heroTitleSlides.length > 1 &&
+  !window.matchMedia("(prefers-reduced-motion: reduce)").matches
+) {
+  let activeHeroTitle = 0;
+  window.setInterval(() => {
+    if (document.visibilityState !== "visible") return;
+    heroTitleSlides[activeHeroTitle].classList.remove("is-active");
+    activeHeroTitle = (activeHeroTitle + 1) % heroTitleSlides.length;
+    heroTitleSlides[activeHeroTitle].classList.add("is-active");
+  }, 4000);
+}
 
 const specRows = content.hero.spec
   .map(
@@ -307,7 +330,10 @@ document.querySelector('[data-slot="hero-spec"]').insertAdjacentHTML(
     <section class="profile-identity" aria-label="${content.hero.specLabel}">
       <div class="profile-portrait"></div>
       <div class="profile-identity-copy">
-        <p class="profile-name">${content.status.name}</p>
+        <p class="profile-name">
+          <span>${content.status.name}</span>
+          <span class="profile-age">${content.hero.identity.age}</span>
+        </p>
         <p class="profile-role">${content.hero.identity.role}</p>
         <p class="profile-location">${content.status.location}</p>
         <p class="profile-availability">
@@ -973,8 +999,6 @@ async function loadGitHubActivity() {
   }
 }
 
-loadGitHubActivity();
-
 const aboutSection = document.querySelector("#about");
 aboutSection.innerHTML = `
   <div class="section-heading">
@@ -1531,133 +1555,504 @@ document.querySelector(
 ).textContent = contact.headingDescription;
 document.querySelector('[data-slot="contact-description"]').textContent =
   contact.description;
-document.querySelector('[data-slot="contact-description"]').insertAdjacentHTML(
-  "afterend",
-  `<p class="contact-description">${contact.locationLabel}: ${contact.location}</p>`,
-);
-document.querySelector('[data-slot="contact-response"]').innerHTML = `
-  <span class="response-label">${contact.responseTime.label}</span>
-  <strong>${contact.responseTime.value}</strong>
-`;
-
 const formContainer = document.querySelector('[data-slot="contact-form"]');
-formContainer.innerHTML = `
-  <form class="contact-form" action="https://api.web3forms.com/submit" method="POST">
-    <input type="hidden" name="access_key" value="${contact.form.accessKey}">
-    <label>
-      <input name="name" autocomplete="name" placeholder=" " required>
-      <span>${contact.form.nameLabel}</span>
-    </label>
-    <label>
-      <input name="email" type="email" autocomplete="email" placeholder=" " required>
-      <span>${contact.form.emailLabel}</span>
-    </label>
-    <label>
-      <textarea name="message" rows="5" placeholder=" " required></textarea>
-      <span>${contact.form.messageLabel}</span>
-    </label>
-    <button class="contact-submit" type="submit">${contact.form.submit}</button>
-    <p class="form-setup" data-form-setup></p>
-    <p class="form-status" role="status" aria-live="polite"></p>
-  </form>
-`;
+const web3FormsAccessKey = data.settings.web3FormsAccessKey;
+const hasWeb3FormsKey =
+  typeof web3FormsAccessKey === "string" &&
+  Boolean(web3FormsAccessKey.trim()) &&
+  web3FormsAccessKey !== "YOUR_WEB3FORMS_ACCESS_KEY";
+const draftStorageKey = "portfolio-contact-draft";
+const contactFieldIds = ["contact-name", "contact-email", "contact-message"];
+const contactFields = new Map();
+let submitAttempted = false;
+let contactSending = false;
+let copyFeedbackTimer = 0;
 
-const socialLinks = contact.links;
-const socialMarkup = [
-  ["email", "email"],
-  ["github", "github"],
-  ["linkedin", "linkedin"],
-]
-  .filter(([key]) => socialLinks[key].href)
-  .map(([key, icon]) => {
-    const link = socialLinks[key];
-    return `
-      <a class="social-link" href="${link.href}" aria-label="${link.label}">
-        <svg class="icon" aria-hidden="true"><use href="assets/icons.svg#${icon}"></use></svg>
-        <span>${link.label}</span>
-      </a>
-    `;
-  })
-  .join("");
+function createContactIcon(name, className = "icon") {
+  const icon = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+  const use = document.createElementNS("http://www.w3.org/2000/svg", "use");
+  icon.classList.add(...className.split(" "));
+  icon.setAttribute("aria-hidden", "true");
+  use.setAttribute("href", `assets/icons.svg#${name}`);
+  icon.append(use);
+  return icon;
+}
 
-if (socialMarkup) {
-  formContainer.insertAdjacentHTML(
-    "afterend",
-    `<nav class="social-links" aria-label="${contact.socialLabel}">${socialMarkup}</nav>`,
+function createContactChannel(label, value, iconName, action) {
+  const row = document.createElement("li");
+  row.className = "contact-channel";
+  row.append(createContactIcon(iconName));
+
+  const content = document.createElement("div");
+  content.className = "contact-channel-copy";
+  const labelElement = document.createElement("span");
+  labelElement.className = "contact-channel-label";
+  labelElement.textContent = label;
+  const valueElement = document.createElement("span");
+  valueElement.className = "contact-channel-value";
+  valueElement.textContent = value;
+  content.append(labelElement, valueElement);
+
+  row.append(content);
+  if (action) row.append(action);
+  return row;
+}
+
+function formatContactTime() {
+  return new Intl.DateTimeFormat(locale, {
+    hour: "2-digit",
+    minute: "2-digit",
+    second: "2-digit",
+    hourCycle: "h23",
+    timeZone: data.timeZone,
+  }).format(new Date());
+}
+
+const contactChannels = document.querySelector(
+  '[data-slot="contact-channels"]',
+);
+contactChannels.setAttribute("aria-label", contact.socialLabel);
+const locationRow = createContactChannel(
+  contact.locationLabel,
+  contact.location,
+  "location",
+);
+const locationContent = locationRow.querySelector(".contact-channel-copy");
+const localTimeLabel = document.createElement("span");
+localTimeLabel.className = "contact-channel-label";
+localTimeLabel.textContent = contact.localTimeLabel;
+const localTime = document.createElement("time");
+localTime.className = "contact-local-time";
+localTime.dataset.contactTime = "";
+localTime.setAttribute("aria-live", "off");
+localTime.textContent = formatContactTime();
+locationContent.append(localTimeLabel, localTime);
+contactChannels.append(locationRow);
+
+const available = document.querySelector(
+  '[data-slot="contact-availability"]',
+);
+available.textContent = content.status.available;
+available.setAttribute(
+  "aria-label",
+  `${contact.availabilityLabel}: ${content.status.available}`,
+);
+
+const responseTime = document.querySelector(
+  '[data-slot="contact-response"]',
+);
+responseTime.textContent = `${contact.responseTime.label}: ${contact.responseTime.value}`;
+
+function getEmailAddress(href) {
+  return href.toLowerCase().startsWith("mailto:")
+    ? href.slice(7).split("?")[0]
+    : href;
+}
+
+async function copyContactEmail(value, status) {
+  try {
+    let copied = false;
+    if (navigator.clipboard?.writeText) {
+      try {
+        await navigator.clipboard.writeText(value);
+        copied = true;
+      } catch {
+        copied = false;
+      }
+    }
+    if (!copied) {
+      const previousFocus = document.activeElement;
+      const temporaryInput = document.createElement("textarea");
+      temporaryInput.value = value;
+      temporaryInput.setAttribute("readonly", "");
+      temporaryInput.tabIndex = -1;
+      temporaryInput.style.cssText =
+        "position:fixed;inset-inline-start:-9999px;inset-block-start:0";
+      document.body.append(temporaryInput);
+      try {
+        temporaryInput.select();
+        copied = document.execCommand("copy");
+      } finally {
+        temporaryInput.remove();
+        if (previousFocus instanceof HTMLElement) previousFocus.focus();
+      }
+      if (!copied) throw new Error("Clipboard copy command was rejected.");
+    }
+    status.textContent = contact.form.copied;
+    window.clearTimeout(copyFeedbackTimer);
+    copyFeedbackTimer = window.setTimeout(() => {
+      status.textContent = "";
+    }, 2000);
+  } catch (error) {
+    console.warn("Unable to copy the contact email.", error);
+    status.textContent = contact.form.copyError;
+  }
+}
+
+Object.entries(contact.links || {}).forEach(([key, link]) => {
+  const href = typeof link?.href === "string" ? link.href.trim() : "";
+  if (!href || href === "#") return;
+
+  if (key === "email" || href.toLowerCase().startsWith("mailto:")) {
+    const email = getEmailAddress(href);
+    const action = document.createElement("button");
+    action.className = "contact-channel-action";
+    action.type = "button";
+    action.setAttribute(
+      "aria-label",
+      `${contact.form.copy} ${link.label}`,
+    );
+    action.append(createContactIcon("copy"));
+    const copyText = document.createElement("span");
+    copyText.textContent = contact.form.copy;
+    action.append(copyText);
+    action.addEventListener("click", () => {
+      copyContactEmail(email, action.querySelector(".contact-copy-status"));
+    });
+    const status = document.createElement("span");
+    status.className = "contact-copy-status sr-only";
+    status.setAttribute("role", "status");
+    status.setAttribute("aria-live", "polite");
+    action.append(status);
+    contactChannels.append(
+      createContactChannel(link.label, email, "email", action),
+    );
+    return;
+  }
+
+  const action = document.createElement("a");
+  action.className = "contact-channel-link";
+  action.href = href;
+  action.target = "_blank";
+  action.rel = "noopener noreferrer";
+  action.setAttribute(
+    "aria-label",
+    `${link.label}, ${contact.form.opensNewTab}`,
+  );
+  action.append(createContactIcon("external-link"));
+  const openText = document.createElement("span");
+  openText.textContent = link.label;
+  action.append(openText);
+  contactChannels.append(
+    createContactChannel(
+      link.label,
+      href.replace(/^https?:\/\//i, "").replace(/\/$/, ""),
+      key === "github" || key === "linkedin" ? key : "external-link",
+      action,
+    ),
+  );
+});
+
+function getFieldError(field) {
+  if (!field.value.trim()) return contact.form.required;
+  if (field.type === "email" && !field.validity.valid) {
+    return contact.form.invalidEmail;
+  }
+  if (field.name === "message" && field.value.length > 1000) {
+    return contact.form.messageTooLong;
+  }
+  return "";
+}
+
+function setFieldError(field, message) {
+  const errorElement = document.getElementById(`${field.id}-error`);
+  const hintId = `${field.id}-hint`;
+  const describedBy = message
+    ? `${hintId} ${errorElement.id}`
+    : hintId;
+  field.setAttribute("aria-describedby", describedBy);
+  if (message) {
+    field.setAttribute("aria-invalid", "true");
+    errorElement.hidden = false;
+    errorElement.querySelector("[data-error-text]").textContent = message;
+  } else {
+    field.removeAttribute("aria-invalid");
+    errorElement.hidden = true;
+    errorElement.querySelector("[data-error-text]").textContent = "";
+  }
+}
+
+function validateContactField(field) {
+  const error = getFieldError(field);
+  setFieldError(field, error);
+  return !error;
+}
+
+function updateMessageCount(field) {
+  const counter = document.querySelector("[data-message-count]");
+  counter.textContent = contact.form.messageCount.replace(
+    "{count}",
+    new Intl.NumberFormat(locale).format(field.value.length),
   );
 }
 
-const contactForm = formContainer.querySelector("form");
-const formSubmit = contactForm.querySelector('button[type="submit"]');
-const formSetup = contactForm.querySelector("[data-form-setup]");
-const formStatus = contactForm.querySelector(".form-status");
-const web3FormsAccessKey = data.settings.web3FormsAccessKey;
-contactForm.querySelector('[name="access_key"]').value = web3FormsAccessKey;
-const hasWeb3FormsKey =
-  web3FormsAccessKey !== "YOUR_WEB3FORMS_ACCESS_KEY";
+function saveContactDraft(form) {
+  const draft = Object.fromEntries(
+    contactFieldIds.map((id) => [id, form.elements.namedItem(
+      id === "contact-name" ? "name" :
+      id === "contact-email" ? "email" : "message",
+    ).value]),
+  );
+  try {
+    sessionStorage.setItem(draftStorageKey, JSON.stringify(draft));
+  } catch (error) {
+    console.warn("Unable to save the contact form draft.", error);
+  }
+}
 
-formSubmit.disabled = !hasWeb3FormsKey;
-formSetup.textContent = hasWeb3FormsKey ? "" : contact.form.setup;
+function clearContactDraft() {
+  try {
+    sessionStorage.removeItem(draftStorageKey);
+  } catch (error) {
+    console.warn("Unable to clear the contact form draft.", error);
+  }
+}
 
-contactForm.addEventListener("submit", async (event) => {
-  event.preventDefault();
-  contactForm.dataset.state = "";
-  formStatus.textContent = "";
+function restoreContactDraft(form) {
+  try {
+    const draftText = sessionStorage.getItem(draftStorageKey);
+    if (!draftText) return;
+    const draft = JSON.parse(draftText);
+    if (!draft || typeof draft !== "object" || Array.isArray(draft)) return;
+    ["name", "email", "message"].forEach((name) => {
+      const value = draft[name];
+      if (typeof value === "string") form.elements.namedItem(name).value = value;
+    });
+  } catch (error) {
+    console.warn("Unable to restore the contact form draft.", error);
+  }
+}
 
-  if (!contactForm.reportValidity()) {
-    contactForm.dataset.state = "error";
-    formStatus.textContent = contact.form.validationError;
+function renderContactForm() {
+  formContainer.innerHTML = `
+    <div class="contact-form-card">
+      <div class="contact-form-header">
+        <p class="contact-form-title">${contact.form.cardTitle}</p>
+        <span class="contact-form-connection" data-connection-state="${hasWeb3FormsKey ? "ready" : "disabled"}">
+          <i aria-hidden="true"></i>${hasWeb3FormsKey ? contact.form.ready : contact.form.disabled}
+        </span>
+      </div>
+      <form class="contact-form" action="https://api.web3forms.com/submit" method="POST" novalidate>
+        <input type="hidden" name="access_key" value="${web3FormsAccessKey}">
+        <div class="contact-honeypot" aria-hidden="true">
+          <label for="contact-botcheck">${contact.form.honeypotLabel}</label>
+          <input id="contact-botcheck" name="botcheck" type="checkbox" tabindex="-1" autocomplete="off">
+        </div>
+        <div class="contact-field">
+          <label class="contact-field-label" for="contact-name">${contact.form.nameLabel}</label>
+          <input id="contact-name" name="name" autocomplete="name" maxlength="120" required aria-describedby="contact-name-hint">
+          <p class="contact-field-hint" id="contact-name-hint">${contact.form.nameHint}</p>
+          <p class="contact-field-error" id="contact-name-error" hidden><svg class="icon" aria-hidden="true"><use href="assets/icons.svg#alert"></use></svg><span data-error-text></span></p>
+        </div>
+        <div class="contact-field">
+          <label class="contact-field-label" for="contact-email">${contact.form.emailLabel}</label>
+          <input id="contact-email" name="email" type="email" autocomplete="email" maxlength="254" required aria-describedby="contact-email-hint">
+          <p class="contact-field-hint" id="contact-email-hint">${contact.form.emailHint}</p>
+          <p class="contact-field-error" id="contact-email-error" hidden><svg class="icon" aria-hidden="true"><use href="assets/icons.svg#alert"></use></svg><span data-error-text></span></p>
+        </div>
+        <div class="contact-field contact-message-field">
+          <label class="contact-field-label" for="contact-message">
+            <span>${contact.form.messageLabel}</span>
+            <span class="contact-character-count" data-message-count aria-live="off"></span>
+          </label>
+          <textarea id="contact-message" name="message" rows="6" maxlength="1000" required aria-describedby="contact-message-hint"></textarea>
+          <p class="contact-field-hint" id="contact-message-hint">${contact.form.messageHint}</p>
+          <p class="contact-field-error" id="contact-message-error" hidden><svg class="icon" aria-hidden="true"><use href="assets/icons.svg#alert"></use></svg><span data-error-text></span></p>
+        </div>
+        <div class="contact-form-toolbar">
+          <p class="contact-shortcut">${contact.form.shortcut} <kbd>Ctrl</kbd> / <kbd>⌘</kbd> + <kbd>Enter</kbd></p>
+        </div>
+        <p class="contact-error-summary" role="alert" tabindex="-1" hidden>
+          <svg class="icon" aria-hidden="true"><use href="assets/icons.svg#alert"></use></svg>
+          <span>${contact.form.errorSummary}</span>
+        </p>
+        <button class="contact-submit" type="submit" ${hasWeb3FormsKey ? "" : 'disabled aria-describedby="contact-setup"'}>
+          <span>${contact.form.submit}</span>
+        </button>
+        <p class="contact-setup" id="contact-setup" role="status" ${hasWeb3FormsKey ? "hidden" : ""}>
+          <svg class="icon" aria-hidden="true"><use href="assets/icons.svg#warning"></use></svg>
+          <span>${contact.form.setup}</span>
+        </p>
+      </form>
+    </div>
+  `;
+
+  const form = formContainer.querySelector(".contact-form");
+  restoreContactDraft(form);
+  contactFieldIds.forEach((id) => {
+    const field = document.getElementById(id);
+    contactFields.set(id, field);
+  });
+  const messageField = contactFields.get("contact-message");
+  updateMessageCount(messageField);
+  submitAttempted = false;
+  contactFieldIds.forEach((id) => setFieldError(contactFields.get(id), ""));
+}
+
+function showContactFailure(form, error) {
+  console.error("Unable to submit the contact form.", error);
+  form.dataset.state = "error";
+  form.removeAttribute("aria-busy");
+  const submitButton = form.querySelector(".contact-submit");
+  submitButton.disabled = false;
+  submitButton.removeAttribute("aria-busy");
+  submitButton.innerHTML = `<span>${contact.form.submit}</span>`;
+
+  const failure = form.querySelector(".contact-error-summary");
+  failure.replaceChildren(createContactIcon("alert"));
+  const message = document.createElement("span");
+  message.textContent = contact.form.error;
+  failure.append(message);
+  const retry = document.createElement("button");
+  retry.className = "contact-retry";
+  retry.type = "button";
+  retry.textContent = contact.form.retry;
+  retry.addEventListener("click", () => sendContactMessage(form));
+  failure.append(retry);
+
+  const emailHref = contact.links?.email?.href?.trim();
+  if (emailHref && emailHref !== "#") {
+    const fallback = document.createElement("p");
+    fallback.className = "contact-fallback";
+    fallback.textContent = `${contact.form.emailFallback}: `;
+    const emailLink = document.createElement("a");
+    emailLink.href = emailHref.toLowerCase().startsWith("mailto:")
+      ? emailHref
+      : `mailto:${emailHref}`;
+    emailLink.textContent = getEmailAddress(emailHref);
+    fallback.append(emailLink);
+    failure.append(fallback);
+  }
+  failure.classList.add("contact-result");
+  failure.hidden = false;
+}
+
+async function sendContactMessage(form) {
+  if (contactSending || !hasWeb3FormsKey) return;
+  submitAttempted = true;
+  form.dataset.state = "";
+  const errorSummary = form.querySelector(".contact-error-summary");
+  errorSummary.classList.remove("contact-result");
+  errorSummary.replaceChildren(createContactIcon("alert"));
+  const summaryMessage = document.createElement("span");
+  summaryMessage.textContent = contact.form.errorSummary;
+  errorSummary.append(summaryMessage);
+  errorSummary.hidden = true;
+  const invalidFields = contactFieldIds
+    .map((id) => contactFields.get(id))
+    .filter((field) => !validateContactField(field));
+  if (invalidFields.length) {
+    errorSummary.hidden = false;
+    invalidFields[0].focus();
     return;
   }
+  errorSummary.hidden = true;
+  const botcheck = form.elements.namedItem("botcheck");
+  if (botcheck.checked) return;
 
-  if (!hasWeb3FormsKey) {
-    return;
-  }
-
+  contactSending = true;
+  form.setAttribute("aria-busy", "true");
+  const submitButton = form.querySelector(".contact-submit");
+  submitButton.disabled = true;
+  submitButton.setAttribute("aria-busy", "true");
+  submitButton.innerHTML = reduceMotionQuery.matches
+    ? `<span>${contact.form.sending}</span>`
+    : `<span class="contact-spinner" aria-hidden="true"></span><span>${contact.form.sending}</span>`;
   recordActivity("I", "formSubmitted");
-  formSubmit.disabled = true;
-  formSubmit.textContent = contact.form.sending;
 
   try {
-    const response = await fetch(contactForm.action, {
+    const response = await fetch(form.action, {
       method: "POST",
-      body: new FormData(contactForm),
+      body: new FormData(form),
     });
-
-    contactForm.addEventListener(
-      "invalid",
-      (event) => event.target.setAttribute("aria-invalid", "true"),
-      true,
-    );
-    contactForm.addEventListener("input", (event) => {
-      if (event.target.validity.valid) {
-        event.target.removeAttribute("aria-invalid");
-      }
-    });
-
     if (!response.ok) {
       throw new Error(`Web3Forms returned ${response.status}.`);
     }
-
     const result = await response.json();
     if (!result.success) {
       throw new Error("Web3Forms did not accept the message.");
     }
 
-    contactForm.reset();
-    contactForm.dataset.state = "success";
-    formStatus.textContent = contact.form.success;
+    clearContactDraft();
     recordActivity("I", "formSucceeded");
+    formContainer.innerHTML = `
+      <div class="contact-form-card contact-success" role="status" aria-live="polite">
+        <p class="contact-result">
+          <svg class="icon" aria-hidden="true"><use href="assets/icons.svg#check"></use></svg>
+          <span>${contact.form.success}</span>
+        </p>
+        <button class="contact-send-another" type="button">${contact.form.sendAnother}</button>
+      </div>
+    `;
+    formContainer.querySelector(".contact-send-another").addEventListener(
+      "click",
+      () => {
+        contactFields.clear();
+        renderContactForm();
+        wireContactForm();
+        contactFields.get("contact-name").focus();
+      },
+    );
   } catch (error) {
-    console.error("Unable to submit the contact form.", error);
-    contactForm.dataset.state = "error";
-    formStatus.textContent = contact.form.error;
     recordActivity("E", "formFailed");
+    showContactFailure(form, error);
   } finally {
-    formSubmit.disabled = false;
-    formSubmit.textContent = contact.form.submit;
+    contactSending = false;
   }
-});
+}
+
+function wireContactForm() {
+  const form = formContainer.querySelector(".contact-form");
+  if (!form) return;
+
+  form.addEventListener("input", (event) => {
+    const field = event.target;
+    if (!contactFieldIds.includes(field.id)) return;
+    saveContactDraft(form);
+    if (field.id === "contact-message") updateMessageCount(field);
+    if (submitAttempted || field.dataset.touched === "true") {
+      validateContactField(field);
+    }
+    if (
+      submitAttempted &&
+      form.dataset.state !== "error" &&
+      contactFieldIds.every((id) =>
+        validateContactField(contactFields.get(id)),
+      )
+    ) {
+      form.querySelector(".contact-error-summary").hidden = true;
+    }
+  });
+
+  form.addEventListener("blur", (event) => {
+    const field = event.target;
+    if (!contactFieldIds.includes(field.id)) return;
+    field.dataset.touched = "true";
+    validateContactField(field);
+  }, true);
+
+  form.addEventListener("submit", (event) => {
+    event.preventDefault();
+    sendContactMessage(form);
+  });
+
+  contactFields.get("contact-message").addEventListener("keydown", (event) => {
+    if (
+      event.key === "Enter" &&
+      (event.ctrlKey || event.metaKey) &&
+      !form.querySelector(".contact-submit").disabled
+    ) {
+      event.preventDefault();
+      form.requestSubmit();
+    }
+  });
+}
+
+renderContactForm();
+wireContactForm();
+window.setInterval(() => {
+  localTime.textContent = formatContactTime();
+}, 1000);
 
 document.querySelector('[data-slot="copyright"]').textContent =
   content.footer.copyright;

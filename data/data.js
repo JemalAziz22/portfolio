@@ -60,9 +60,10 @@ window.PORTFOLIO_DATA = {
         eyebrow: "COMPUTER SYSTEMS / ANDROID / FULL-STACK WEB",
         sampleLabel: "",
         title: "Computer Systems Engineer · Android Developer · Full-Stack Web Developer",
-        titleParts: [
-          { text: "Computer Systems Engineer · " },
-          { text: "Android Developer · Full-Stack Web Developer", accent: true },
+        titleSlides: [
+          "Computer Systems Engineer",
+          "Android Developer",
+          "Full-Stack Web Developer",
         ],
         description:
           "Computer Systems Engineer with five years of technical experience, developing Android applications and full-stack web applications across backend and frontend.",
@@ -71,9 +72,10 @@ window.PORTFOLIO_DATA = {
         metrics: [
           { label: "YEARS EXPERIENCE", value: 5, suffix: "" },
         ],
-        specLabel: "PROFILE",
+        specLabel: "PROFILE OVERVIEW",
         identity: {
-          role: "Computer Systems Engineer · Android · Full-Stack Web",
+          role: "Computer Systems Engineer",
+          age: "25 years old",
           id: "",
           sampleLabel: "",
           imageAlt: "Portrait of Jemal Aziz",
@@ -89,7 +91,7 @@ window.PORTFOLIO_DATA = {
         ],
         terminal: {
           label: "TERMINAL / SESSION 01",
-          windowTitle: "portfolio-shell",
+          windowTitle: "",
           prompt: "visitor@portfolio:~$",
           tabs: { console: "Console", monitor: "Monitor", logcat: "Logcat" },
           inputLabel: "Terminal command",
@@ -185,23 +187,23 @@ window.PORTFOLIO_DATA = {
           updated: "Updated",
         },
         spec: [
-          ["ROLE", "Computer Systems Engineer", "layers"],
-          ["ANDROID", "Kotlin / Jetpack Compose", "android"],
-          ["WEB", "Full-Stack · Backend / Frontend", "terminal"],
-          ["SYSTEMS", "C++ / Linux", "chip"],
-          ["BASED IN", "Al-Hasakah, Syria", "location"],
+          ["PROFESSION", "Computer Systems Engineer", "layers"],
+          ["ANDROID DEVELOPMENT", "Kotlin · Jetpack Compose", "android"],
+          ["WEB DEVELOPMENT", "Frontend · Backend", "terminal"],
+          ["SYSTEMS PROGRAMMING", "C++ · Linux", "chip"],
+          ["LOCATION", "Al-Hasakah, Syria", "location"],
         ],
       },
       about: {
         index: "01 / ABOUT",
         title: "Computer Systems Engineering",
         description:
-          "Android development, full-stack web development, systems programming, and ICDL training.",
+          "Five years of experience in Android and full-stack development, systems programming, and ICDL training.",
         sampleLabel: "",
         circuitLabel: "Simplified systems circuit diagram",
         metricSampleLabel: "",
         paragraphs: [
-          "I am a Computer Systems Engineer with five years of technical experience in Android application development and full-stack web development across backend and frontend. I am also an ICDL Trainer.",
+          "I’m a Computer Systems Engineer with five years of experience building Android applications and full-stack web projects, from frontend to backend. I also work as an ICDL trainer, combining hands-on development with digital skills training.",
         ],
         metrics: [
           { label: "YEARS OF EXPERIENCE", value: 5, suffix: "" },
@@ -398,10 +400,12 @@ window.PORTFOLIO_DATA = {
         title: "Start a conversation",
         headingDescription: "Contact for project enquiries and technical discussions.",
         description:
-          "For project enquiries, collaboration, or technical discussions, send a message below.",
+          "For project enquiries, collaboration, technical discussions, or ICDL training, send a message below.",
         socialLabel: "Contact links",
         locationLabel: "Based in",
         location: "Al-Hasakah, Syria",
+        localTimeLabel: "LOCAL TIME",
+        availabilityLabel: "AVAILABILITY",
         links: {
           // PLACEHOLDER: Add a verified email address and LinkedIn profile.
           email: { label: "Email", href: "" },
@@ -410,16 +414,37 @@ window.PORTFOLIO_DATA = {
         },
         responseTime: {
           label: "RESPONSE TIME",
+          // PLACEHOLDER: Replace with a verified response time.
           value: "Usually within 2 days",
         },
         form: {
+          cardTitle: "MESSAGE / v1.0",
+          ready: "Ready",
+          disabled: "Disabled",
           nameLabel: "NAME",
           emailLabel: "EMAIL",
           messageLabel: "MESSAGE",
+          nameHint: "Enter your name.",
+          emailHint: "Use an address where I can reply.",
+          messageHint: "Up to 1,000 characters.",
+          messageCount: "{count} / 1,000",
+          shortcut: "Send with",
+          required: "This field is required.",
+          invalidEmail: "Enter a valid email address.",
+          messageTooLong: "Keep your message within 1,000 characters.",
+          errorSummary: "Please correct the highlighted fields.",
           submit: "Send message",
           sending: "Sending…",
           success: "Message sent. Thank you.",
           error: "Message could not be sent. Please try again.",
+          retry: "Retry",
+          sendAnother: "Send another message",
+          copied: "Copied",
+          copy: "Copy",
+          copyError: "Could not copy. Select and copy the address manually.",
+          opensNewTab: "opens in a new tab",
+          emailFallback: "Or email me directly",
+          honeypotLabel: "Leave this field empty",
           validationError: "Check the highlighted fields before sending.",
           setup: "Add your Web3Forms access key in data/data.js to enable sending.",
         },
@@ -467,9 +492,10 @@ window.PORTFOLIO_DATA = {
         eyebrow: "نظم الحاسوب / أندرويد / ويب Full-Stack",
         sampleLabel: "",
         title: "مهندس نظم حاسوب · مطوّر Android · مطوّر ويب Full-Stack",
-        titleParts: [
-          { text: "مهندس نظم حاسوب · " },
-          { text: "مطوّر Android · مطوّر ويب Full-Stack", accent: true },
+        titleSlides: [
+          "مهندس نظم حاسوب",
+          "مطوّر Android",
+          "مطوّر ويب Full-Stack",
         ],
         description:
           "مهندس نظم حاسوب بخبرة تقنية تمتد لخمس سنوات، يطوّر تطبيقات Android وتطبيقات ويب متكاملة تشمل الواجهة الأمامية والخلفية.",
@@ -478,9 +504,10 @@ window.PORTFOLIO_DATA = {
         metrics: [
           { label: "سنوات الخبرة", value: 5, suffix: "" },
         ],
-        specLabel: "الملف",
+        specLabel: "الملف الشخصي",
         identity: {
-          role: "مهندس نظم حاسوب · Android · ويب Full-Stack",
+          role: "مهندس نظم حاسوب",
+          age: "25 سنة",
           id: "",
           sampleLabel: "",
           imageAlt: "صورة جمال عزيز",
@@ -496,7 +523,7 @@ window.PORTFOLIO_DATA = {
         ],
         terminal: {
           label: "الطرفية / الجلسة 01",
-          windowTitle: "portfolio-shell",
+          windowTitle: "",
           prompt: "زائر@portfolio:~$",
           tabs: { console: "Console", monitor: "Monitor", logcat: "Logcat" },
           inputLabel: "أمر الطرفية",
@@ -592,22 +619,22 @@ window.PORTFOLIO_DATA = {
           updated: "آخر تحديث",
         },
         spec: [
-          ["الدور", "مهندس نظم حاسوب", "layers"],
-          ["Android", "Kotlin / Jetpack Compose", "android"],
-          ["الويب", "Full-Stack · Backend / Frontend", "terminal"],
-          ["الأنظمة", "C++ / Linux", "chip"],
+          ["المهنة", "مهندس نظم حاسوب", "layers"],
+          ["تطوير Android", "Kotlin · Jetpack Compose", "android"],
+          ["تطوير الويب", "الواجهة الأمامية · الخلفية", "terminal"],
+          ["برمجة الأنظمة", "C++ · Linux", "chip"],
           ["الموقع", "الحسكة، سوريا", "location"],
         ],
       },
       about: {
         index: "01 / عنّي",
         title: "هندسة نظم الحاسوب",
-        description: "تطوير Android والويب المتكامل والأنظمة، إلى جانب تدريب ICDL.",
+        description: "خمس سنوات من الخبرة في تطوير Android والويب المتكامل والأنظمة، إلى جانب تدريب ICDL.",
         sampleLabel: "",
         circuitLabel: "رسم مبسّط لدائرة أنظمة",
         metricSampleLabel: "",
         paragraphs: [
-          "أنا مهندس نظم حاسوب بخبرة تقنية تمتد لخمس سنوات في تطوير تطبيقات Android وتطوير الويب Full-Stack للواجهة الأمامية والخلفية. كما أعمل مدرّب ICDL.",
+          "أنا مهندس نظم حاسوب أمتلك خبرة تمتد لخمس سنوات في تطوير تطبيقات Android ومشاريع الويب المتكاملة، من الواجهة الأمامية إلى الخلفية. كما أعمل مدرّبًا لـ ICDL، وأجمع في عملي بين التطوير التقني ونقل المهارات الرقمية.",
         ],
         metrics: [
           { label: "سنوات الخبرة", value: 5, suffix: "" },
@@ -804,10 +831,12 @@ window.PORTFOLIO_DATA = {
         title: "لنبدأ حوارًا",
         headingDescription: "للاستفسارات عن المشاريع والنقاشات التقنية.",
         description:
-          "للاستفسار عن مشروع أو التعاون أو النقاشات التقنية، أرسل رسالة عبر النموذج.",
+          "للاستفسار عن مشروع أو التعاون أو النقاشات التقنية أو دورات ICDL، أرسل رسالة عبر النموذج.",
         socialLabel: "روابط التواصل",
         locationLabel: "الموقع",
         location: "الحسكة، سوريا",
+        localTimeLabel: "التوقيت المحلي",
+        availabilityLabel: "التوفر",
         links: {
           // PLACEHOLDER: أضف البريد الإلكتروني ورابط LinkedIn بعد التحقق منهما.
           email: { label: "البريد الإلكتروني", href: "" },
@@ -816,16 +845,37 @@ window.PORTFOLIO_DATA = {
         },
         responseTime: {
           label: "متوسط زمن الرد",
+          // PLACEHOLDER: استبدله بمدة رد مؤكدة.
           value: "عادةً خلال يومين",
         },
         form: {
+          cardTitle: "رسالة / v1.0",
+          ready: "جاهز",
+          disabled: "غير مفعّل",
           nameLabel: "الاسم",
           emailLabel: "البريد الإلكتروني",
           messageLabel: "الرسالة",
+          nameHint: "اكتب اسمك.",
+          emailHint: "أدخل بريدًا يمكنني الرد عليه.",
+          messageHint: "حتى ١٬٠٠٠ حرف.",
+          messageCount: "{count} / ١٬٠٠٠",
+          shortcut: "للإرسال استخدم",
+          required: "هذا الحقل مطلوب.",
+          invalidEmail: "أدخل عنوان بريد إلكتروني صالحًا.",
+          messageTooLong: "يجب ألا تتجاوز الرسالة ١٬٠٠٠ حرف.",
+          errorSummary: "يرجى تصحيح الحقول المحددة.",
           submit: "إرسال الرسالة",
           sending: "جارٍ الإرسال…",
           success: "تم إرسال الرسالة. شكرًا لك.",
           error: "تعذّر إرسال الرسالة. حاول مرة أخرى.",
+          retry: "إعادة المحاولة",
+          sendAnother: "إرسال رسالة أخرى",
+          copied: "تم النسخ",
+          copy: "نسخ",
+          copyError: "تعذّر النسخ. حدّد البريد وانسخه يدويًا.",
+          opensNewTab: "يفتح في علامة تبويب جديدة",
+          emailFallback: "أو راسلني مباشرةً",
+          honeypotLabel: "اترك هذا الحقل فارغًا",
           validationError: "تحقّق من الحقول المحددة قبل الإرسال.",
           setup: "أضف مفتاح Web3Forms في data/data.js لتفعيل الإرسال.",
         },
@@ -883,19 +933,21 @@ kurmanji.hero = {
   ...kurmanji.hero,
   eyebrow: "SÎSTEMÊN KOMPUTERÊ / ANDROID / WEB-Ê FULL-STACK",
   title: "Endezyarê Sîstemên Komputerê · Pêşdebirê Android · Pêşdebirê Web-ê Full-Stack",
-  titleParts: [
-    { text: "Endezyarê Sîstemên Komputerê · " },
-    { text: "Pêşdebirê Android · Pêşdebirê Web-ê Full-Stack", accent: true },
+  titleSlides: [
+    "Endezyarê Sîstemên Komputerê",
+    "Pêşdebirê Android",
+    "Pêşdebirê Web-ê Full-Stack",
   ],
   description:
     "Endezyarê sîstemên komputerê bi pênc sal tecrubeya teknîkî; sepanên Android û sepanên Web-ê Full-Stack ji alîyê Backend û Frontend ve pêş dixe.",
   projectsLink: "Proje bibîne",
   contactLink: "Têkilî",
   metrics: [{ label: "SALÊN TECRÛBEYÊ", value: 5, suffix: "" }],
-  specLabel: "PROFÎL",
+  specLabel: "PROFÎLA KESANE",
   identity: {
     ...kurmanji.hero.identity,
-    role: "Endezyarê Sîstemên Komputerê · Android · Web-ê Full-Stack",
+    role: "Endezyarê Sîstemên Komputerê",
+    age: "25 salî",
     sampleLabel: "",
     imageAlt: "Wêneyê Jemal Aziz",
   },
@@ -912,7 +964,7 @@ kurmanji.hero = {
 
 Object.assign(kurmanji.hero.terminal, {
   label: "TERMÎNAL / DANÎŞÎNA 01",
-  windowTitle: "portfolio-shell",
+  windowTitle: "",
   prompt: "visitor@portfolio:~$",
   tabs: { console: "Console", monitor: "Monitor", logcat: "Logcat" },
   inputLabel: "Fermana termînalê",
@@ -999,7 +1051,7 @@ Object.assign(kurmanji.hero.monitor, {
 
 Object.assign(kurmanji.hero.now, {
   label: "GITHUB / NIHA",
-  status: "ÇALAKIYA GIŞTÎ",
+  status: "",
   loading: "Çalakiya giştî tê kontrolkirin…",
   missingUsername: "Ji bo çalakiya giştî github.username di data/data.js de saz bike.",
   unavailable: "Çalakiya GitHub nîne.",
@@ -1010,24 +1062,26 @@ Object.assign(kurmanji.hero.now, {
 });
 
 kurmanji.hero.spec = [
-  ["ROL", "Endezyarê Sîstemên Komputerê", "layers"],
-  ["ANDROID", "Kotlin / Jetpack Compose", "android"],
-  ["WEB", "Full-Stack · Backend / Frontend", "terminal"],
-  ["SÎSTEM", "C++ / Linux", "chip"],
+  ["PÎŞE", "Endezyarê Sîstemên Komputerê", "layers"],
+  ["PÊŞXISTINA ANDROID", "Kotlin · Jetpack Compose", "android"],
+  ["PÊŞXISTINA WEB", "Frontend · Backend", "terminal"],
+  ["BERNAMEKIRINA SÎSTEMAN", "C++ · Linux", "chip"],
   ["CIH", "Hesîçe, Sûriye", "location"],
 ];
 
 Object.assign(kurmanji.about, {
   index: "01 / DERBARÊ MIN",
   title: "Endezyariya Sîstemên Komputerê",
-  description: "Pêşxistina Android û Web-ê Full-Stack, sîstem û perwerdehiya ICDL.",
+  description: "Pênc sal tecrûbe di pêşxistina Android û Web-ê Full-Stack, sîstem û perwerdehiya ICDL de.",
   sampleLabel: "",
   circuitLabel: "Nexşeya hêsan a çerxa sîstemê",
   metricSampleLabel: "",
   paragraphs: [
-    "Ez endezyarê sîstemên komputerê me û pênc sal tecrubeya teknîkî di pêşxistina sepanên Android û Web-ê Full-Stack ji bo Backend û Frontend de heye. Her wiha mamosteyê ICDL me.",
+    "Ez endezyarê sîstemên komputerê me û pênc sal tecrûbeya min di çêkirina sepanên Android û projeyên Web-ê Full-Stack de heye, ji Frontend heta Backend. Her wiha ez mamosteyê ICDL me û di perwerdehiya jêhatîbûnên dîjîtal de dixebitim.",
   ],
-  metrics: [{ label: "SALÊN TECRÛBEYÊ", value: 5, suffix: "" }],
+  metrics: [
+    { label: "SALÊN TECRÛBEYÊ", value: 5, suffix: "" },
+  ],
 });
 
 Object.assign(kurmanji.skills, {
@@ -1171,25 +1225,51 @@ Object.assign(kurmanji.contact, {
   index: "04 / TÊKILÎ",
   title: "Têkilî dayne",
   headingDescription: "Ji bo pirsên projeyê û nîqaşên teknîkî têkilî dayne.",
-  description: "Ji bo pirsên projeyê, hevkariyê an nîqaşên teknîkî peyamek bişîne.",
+  description: "Ji bo pirsên projeyê, hevkariyê, nîqaşên teknîkî an perwerdehiya ICDL peyamek bişîne.",
   socialLabel: "Girêdanên têkiliyê",
   locationLabel: "Cih",
   location: "Hesîçe, Sûriye",
+  localTimeLabel: "DEMA HERÊMÎ",
+  availabilityLabel: "BIXEBATINÊ AMADE",
   links: {
     email: { label: "E-name", href: "" },
     github: { label: "GitHub", href: "https://github.com/JemalAziz22" },
     linkedin: { label: "LinkedIn", href: "" },
   },
-  responseTime: { label: "DEMA BERSIVÊ", value: "Bi gelemperî di nav 2 rojan de" },
+  responseTime: {
+    label: "DEMA BERSIVÊ",
+    // PLACEHOLDER: Li şûna demeke bersivê ya piştrastkirî binivîse.
+    value: "Bi gelemperî di nav 2 rojan de",
+  },
   form: {
     ...kurmanji.contact.form,
+    cardTitle: "PEYAM / v1.0",
+    ready: "Amade",
+    disabled: "Neçalak",
     nameLabel: "NAV",
     emailLabel: "E-NAME",
     messageLabel: "PEYAM",
+    nameHint: "Navê xwe binivîse.",
+    emailHint: "Navnîşanek binivîse ku ez bikarim bersiv bidim.",
+    messageHint: "Herî zêde 1,000 tîp.",
+    messageCount: "{count} / 1,000",
+    shortcut: "Ji bo şandinê bikar bîne",
+    required: "Ev qad pêwîst e.",
+    invalidEmail: "Navnîşaneke e-nameyê ya rast binivîse.",
+    messageTooLong: "Peyama xwe di nav 1,000 tîpan de bigire.",
+    errorSummary: "Ji kerema xwe qadên nîşankirî rast bike.",
     submit: "Peyamê bişîne",
     sending: "Tê şandin…",
     success: "Peyam hate şandin. Spas.",
     error: "Peyam nehat şandin. Ji kerema xwe dîsa biceribîne.",
+    retry: "Dîsa biceribîne",
+    sendAnother: "Peyameke din bişîne",
+    copied: "Hat kopîkirin",
+    copy: "Kopî bike",
+    copyError: "Nekarî kopî bikî. Navnîşanê bi destan hilbijêre û kopî bike.",
+    opensNewTab: "di hilbereke nû de vedibe",
+    emailFallback: "An rasterast e-nameyê bişîne",
+    honeypotLabel: "Vê qadê vala bihêle",
     validationError: "Berî şandinê qadên nîşankirî kontrol bike.",
     setup: "Ji bo çalakkirina şandinê mifteya Web3Forms di data/data.js de zêde bike.",
   },

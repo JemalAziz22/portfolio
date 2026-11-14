@@ -1,20 +1,20 @@
 :root {
   color-scheme: dark;
 
-  --color-bg: #080b10;
-  --color-surface: #0e131a;
-  --color-surface-raised: #151c26;
-  --color-border: #1f2a38;
-  --color-border-active: #2b3b50;
-  --color-text: #e8ecf2;
-  --color-muted: #98a4b5;
-  --color-dim: #808da1;
-  --color-accent: #60a5fa;
-  --color-data: #38bdf8;
+  --color-bg: #090d12;
+  --color-surface: #0f151b;
+  --color-surface-raised: #172129;
+  --color-border: #26333c;
+  --color-border-active: #384b53;
+  --color-text: #e6edf0;
+  --color-muted: #9cafb5;
+  --color-dim: #82969d;
+  --color-accent: #6dd3c5;
+  --color-data: #8cb9cf;
   --color-status: #34d399;
   --color-danger: #fb7185;
   --color-language: #a78bfa;
-  --color-focus: #38bdf8;
+  --color-focus: #6dd3c5;
   --color-skill-android: var(--color-accent);
   --color-skill-systems: var(--color-data);
   --color-skill-web: var(--color-status);
@@ -27,6 +27,7 @@
   --space-2: 8px;
   --space-3: 12px;
   --space-4: 16px;
+  --space-5: 20px;
   --space-6: 24px;
   --space-8: 32px;
   --space-12: 48px;
@@ -42,46 +43,48 @@
   --motion-interaction: 180ms;
   --motion-theme: 250ms;
   --motion-reveal: 520ms;
+  --motion-spinner: 900ms;
+  --motion-status: 2400ms;
   --ease-ui: cubic-bezier(0.2, 0.7, 0.2, 1);
 }
 
 [data-theme="light"] {
   color-scheme: light;
 
-  --color-bg: #f6f7f9;
-  --color-surface: #ffffff;
-  --color-surface-raised: #edf1f5;
-  --color-border: #d7dfe8;
-  --color-border-active: #aab8c8;
-  --color-text: #17212d;
-  --color-muted: #46576b;
-  --color-dim: #596a7e;
-  --color-accent: #1d4ed8;
-  --color-data: #006a9b;
+  --color-bg: #f5f8f7;
+  --color-surface: #fcfefd;
+  --color-surface-raised: #eaf0ef;
+  --color-border: #d5e0de;
+  --color-border-active: #aabbb7;
+  --color-text: #1a2927;
+  --color-muted: #485b58;
+  --color-dim: #566966;
+  --color-accent: #0b756b;
+  --color-data: #346d65;
   --color-status: #087a51;
   --color-danger: #b42345;
   --color-language: #6841b8;
-  --color-focus: #006a9b;
+  --color-focus: #0b756b;
 }
 
 @media (prefers-color-scheme: light) {
   :root:not([data-theme]) {
     color-scheme: light;
 
-    --color-bg: #f6f7f9;
-    --color-surface: #ffffff;
-    --color-surface-raised: #edf1f5;
-    --color-border: #d7dfe8;
-    --color-border-active: #aab8c8;
-    --color-text: #17212d;
-    --color-muted: #46576b;
-    --color-dim: #596a7e;
-    --color-accent: #1d4ed8;
-    --color-data: #006a9b;
+    --color-bg: #f5f8f7;
+    --color-surface: #fcfefd;
+    --color-surface-raised: #eaf0ef;
+    --color-border: #d5e0de;
+    --color-border-active: #aabbb7;
+    --color-text: #1a2927;
+    --color-muted: #485b58;
+    --color-dim: #566966;
+    --color-accent: #0b756b;
+    --color-data: #346d65;
     --color-status: #087a51;
     --color-danger: #b42345;
     --color-language: #6841b8;
-    --color-focus: #006a9b;
+    --color-focus: #0b756b;
   }
 }
 
