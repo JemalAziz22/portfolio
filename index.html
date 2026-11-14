@@ -4,22 +4,22 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="theme-color" content="#080B10">
-    <title>Jemal Aziz — Computer Systems Engineer · Android &amp; Full-Stack Web Developer</title>
+    <title>Jemal Aziz — Computer Systems Engineering Student · Android &amp; Full-Stack Web Developer</title>
     <meta
       name="description"
-      content="Jemal Aziz is a Computer Systems Engineer, Android application developer, full-stack web developer, and ICDL Trainer based in Al-Hasakah, Syria."
+      content="Jemal Aziz is a Computer Systems Engineering student at Cordoba Private University, Android and full-stack web developer, and ICDL Trainer based in Al-Hasakah, Syria."
     >
     <meta property="og:type" content="website">
-    <meta property="og:title" content="Jemal Aziz — Computer Systems Engineer · Android &amp; Full-Stack Web Developer">
+    <meta property="og:title" content="Jemal Aziz — Computer Systems Engineering Student · Android &amp; Full-Stack Web Developer">
     <meta
       property="og:description"
-      content="Jemal Aziz is a Computer Systems Engineer, Android application developer, full-stack web developer, and ICDL Trainer based in Al-Hasakah, Syria."
+      content="Jemal Aziz is a Computer Systems Engineering student at Cordoba Private University, Android and full-stack web developer, and ICDL Trainer based in Al-Hasakah, Syria."
     >
     <meta name="twitter:card" content="summary">
-    <meta name="twitter:title" content="Jemal Aziz — Computer Systems Engineer · Android &amp; Full-Stack Web Developer">
+    <meta name="twitter:title" content="Jemal Aziz — Computer Systems Engineering Student · Android &amp; Full-Stack Web Developer">
     <meta
       name="twitter:description"
-      content="Jemal Aziz is a Computer Systems Engineer, Android application developer, full-stack web developer, and ICDL Trainer based in Al-Hasakah, Syria."
+      content="Jemal Aziz is a Computer Systems Engineering student at Cordoba Private University, Android and full-stack web developer, and ICDL Trainer based in Al-Hasakah, Syria."
     >
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -45,19 +45,6 @@
           <svg class="icon" aria-hidden="true"><use href="assets/icons.svg#location"></use></svg>
           <span class="status-label" data-slot="location-label"></span>
           <span data-slot="location"></span>
-        </span>
-        <span class="status-clock">
-          <span class="status-label" data-slot="time-label"></span>
-          <time data-slot="time" aria-live="off"></time>
-        </span>
-        <span class="status-uptime">
-          <span class="status-label" data-slot="uptime-label"></span>
-          <time data-slot="uptime" aria-live="off">00:00:00</time>
-        </span>
-        <span class="status-availability">
-          <span class="availability-indicator" aria-hidden="true"></span>
-          <span data-slot="availability"></span>
-          <span class="availability-sample" data-slot="availability-sample"></span>
         </span>
       </div>
       <div class="header-tools">
@@ -106,6 +93,10 @@
           </div>
         </div>
         <div class="project-columns" data-slot="project-columns" aria-hidden="true"></div>
+        <p class="projects-coming-soon" data-slot="projects-coming-soon" hidden>
+          <svg class="icon" aria-hidden="true"><use href="assets/icons.svg#layers"></use></svg>
+          <span></span>
+        </p>
         <ol class="project-list" data-slot="project-list"></ol>
       </section>
       <section id="contact" aria-labelledby="contact-title">
@@ -122,6 +113,7 @@
           <div class="contact-intro">
             <p class="contact-description" data-slot="contact-description"></p>
             <ul class="contact-channels" data-slot="contact-channels"></ul>
+            <ul class="contact-socials" data-slot="contact-socials" hidden></ul>
             <div class="contact-availability">
               <span class="availability-indicator" aria-hidden="true"></span>
               <span data-slot="contact-availability"></span>

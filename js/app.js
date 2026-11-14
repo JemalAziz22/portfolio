@@ -172,10 +172,6 @@ const slots = {
   name: content.status.name,
   "location-label": content.status.locationLabel,
   location: content.status.location,
-  "time-label": content.status.localTimeLabel,
-  availability: content.status.available,
-  "availability-sample": content.status.availabilitySampleLabel,
-  "uptime-label": content.live.uptimeLabel,
 };
 
 Object.entries(slots).forEach(([name, value]) => {
@@ -387,7 +383,6 @@ document.querySelector('[data-slot="hero-spec"]').insertAdjacentHTML(
 
 const terminal = content.hero.terminal;
 const monitor = content.hero.monitor;
-const now = content.hero.now;
 const reduceMotionQuery = window.matchMedia(
   "(prefers-reduced-motion: reduce)",
 );
@@ -496,21 +491,6 @@ document.querySelector(".profile-identity").insertAdjacentHTML(
   "afterend",
   terminalMarkup,
 );
-document.querySelector(".terminal-block").insertAdjacentHTML(
-  "afterend",
-  `
-    <aside class="now-panel" aria-label="${now.label}">
-      <div class="now-heading">
-        <span class="now-label">${now.label}</span>
-        <span class="now-status"><i aria-hidden="true"></i><span data-now-status>${now.status}</span></span>
-      </div>
-      <p class="now-title" data-now-title>${now.loading}</p>
-      <p class="now-message" data-now-message></p>
-      <p class="now-updated" data-now-updated></p>
-    </aside>
-  `,
-);
-
 const terminalOutput = document.querySelector(".terminal-output");
 const terminalScreen = document.querySelector(".terminal-screen");
 const terminalInput = document.querySelector("#terminal-command");
@@ -616,14 +596,21 @@ function runTerminalCommand(rawCommand) {
     case "skills":
       output.push(terminal.text.skillsHeading);
       content.skills.groups.forEach((group) => {
-        output.push(`${group.name}: ${group.items.join(", ")}`);
+        const skills = group.items.map((skill) =>
+          typeof skill === "string" ? skill : skill.name,
+        );
+        output.push(`${group.name}: ${skills.join(", ")}`);
       });
       break;
     case "projects":
       output.push(terminal.text.projectsHeading);
-      content.projects.items.forEach((project, index) => {
-        output.push(`${project.id || index + 1} — ${project.name}`);
-      });
+      if (content.projects.items.length) {
+        content.projects.items.forEach((project, index) => {
+          output.push(`${project.id || index + 1} — ${project.name}`);
+        });
+      } else {
+        output.push(content.projects.comingSoon);
+      }
       scrollToSection("projects");
       break;
     case "open": {
@@ -830,174 +817,7 @@ document.querySelector(".logcat-clear").addEventListener("click", () => {
   renderLogcat();
 });
 
-const nowPanel = document.querySelector(".now-panel");
 appendConsoleLine(terminal.text.ready);
-
-function renderNow(status, title, message = "", updated = "") {
-  nowPanel.querySelector("[data-now-status]").textContent = status;
-  nowPanel.querySelector("[data-now-title]").textContent = title;
-  nowPanel.querySelector("[data-now-message]").textContent = message;
-  nowPanel.querySelector("[data-now-updated]").textContent = updated;
-}
-
-function renderSampleNow(extraMessage = "") {
-  const message = [now.sampleMessage, extraMessage].filter(Boolean).join(" ");
-  renderNow(
-    now.sampleStatus,
-    now.sampleTitle,
-    message,
-    `${now.updated} · ${now.sampleStatus}`,
-  );
-}
-
-function formatRelativeTime(date) {
-  const elapsedMinutes = Math.max(
-    0,
-    Math.floor((Date.now() - date.getTime()) / 60000),
-  );
-  if (elapsedMinutes < 1) return terminal.text.relativeNow;
-  if (elapsedMinutes < 60) {
-    return localizeMessage(terminal.text.relativeMinutes, {
-      count: new Intl.NumberFormat(locale).format(elapsedMinutes),
-    });
-  }
-  const elapsedHours = Math.floor(elapsedMinutes / 60);
-  if (elapsedHours < 24) {
-    return localizeMessage(terminal.text.relativeHours, {
-      count: new Intl.NumberFormat(locale).format(elapsedHours),
-    });
-  }
-  return localizeMessage(terminal.text.relativeDays, {
-    count: new Intl.NumberFormat(locale).format(
-      Math.floor(elapsedHours / 24),
-    ),
-  });
-}
-
-function renderGitHubActivity(activity) {
-  const date = new Date(activity.date);
-  if (Number.isNaN(date.getTime())) {
-    throw new Error("GitHub activity returned an invalid timestamp.");
-  }
-  renderNow(
-    now.status,
-    activity.message,
-    activity.repository,
-    `${now.updated} · ${formatRelativeTime(date)}`,
-  );
-}
-
-function isValidGitHubActivity(activity) {
-  return (
-    activity &&
-    typeof activity.message === "string" &&
-    typeof activity.repository === "string" &&
-    typeof activity.date === "string"
-  );
-}
-
-async function fetchLatestGitHubActivity(username) {
-  const encodedUsername = encodeURIComponent(username);
-  const eventsResponse = await fetch(
-    `https://api.github.com/users/${encodedUsername}/events/public?per_page=30`,
-    { headers: { Accept: "application/vnd.github+json" } },
-  );
-  if (!eventsResponse.ok) {
-    throw new Error(`GitHub events returned ${eventsResponse.status}.`);
-  }
-  const events = await eventsResponse.json();
-  const latestPush = events.find(
-    (event) =>
-      event.type === "PushEvent" &&
-      Array.isArray(event.payload?.commits) &&
-      event.payload.commits.length > 0,
-  );
-  if (latestPush) {
-    const commit = latestPush.payload.commits.at(-1);
-    return {
-      message: commit.message,
-      repository: latestPush.repo.name,
-      date: latestPush.created_at,
-    };
-  }
-
-  const reposResponse = await fetch(
-    `https://api.github.com/users/${encodedUsername}/repos?sort=updated&per_page=1`,
-    { headers: { Accept: "application/vnd.github+json" } },
-  );
-  if (!reposResponse.ok) {
-    throw new Error(`GitHub repositories returned ${reposResponse.status}.`);
-  }
-  const repositories = await reposResponse.json();
-  const repository = repositories[0];
-  if (!repository?.full_name) return null;
-
-  const commitResponse = await fetch(
-    `https://api.github.com/repos/${repository.full_name}/commits?per_page=1`,
-    { headers: { Accept: "application/vnd.github+json" } },
-  );
-  if (!commitResponse.ok) {
-    throw new Error(`GitHub commits returned ${commitResponse.status}.`);
-  }
-  const commits = await commitResponse.json();
-  const latestCommit = commits[0];
-  if (!latestCommit?.commit?.message || !latestCommit.commit.author?.date) {
-    return null;
-  }
-  return {
-    message: latestCommit.commit.message,
-    repository: repository.full_name,
-    date: latestCommit.commit.author.date,
-  };
-}
-
-async function loadGitHubActivity() {
-  const username = data.github?.username?.trim();
-  if (!username) {
-    renderSampleNow(now.missingUsername);
-    return;
-  }
-
-  const cacheKey = `portfolio-github-activity:${username.toLowerCase()}`;
-  const cachedText = localStorage.getItem(cacheKey);
-  if (cachedText) {
-    try {
-      const cached = JSON.parse(cachedText);
-      if (
-        isValidGitHubActivity(cached?.activity) &&
-        Number.isFinite(cached?.fetchedAt) &&
-        Date.now() - cached.fetchedAt < 30 * 60 * 1000
-      ) {
-        renderGitHubActivity(cached.activity);
-        return;
-      }
-      localStorage.removeItem(cacheKey);
-    } catch (error) {
-      if (!(error instanceof SyntaxError)) throw error;
-      localStorage.removeItem(cacheKey);
-    }
-  }
-
-  try {
-    const activity = await fetchLatestGitHubActivity(username);
-    if (!activity) {
-      renderNow(now.status, terminal.text.noPublicActivity);
-      return;
-    }
-    if (!isValidGitHubActivity(activity)) {
-      throw new Error("GitHub returned an incomplete activity record.");
-    }
-    localStorage.setItem(
-      cacheKey,
-      JSON.stringify({ activity, fetchedAt: Date.now() }),
-    );
-    renderGitHubActivity(activity);
-  } catch (error) {
-    console.warn("GitHub activity unavailable; showing the sample snapshot.", error);
-    recordActivity("W", "githubUnavailable");
-    renderSampleNow(now.unavailable);
-  }
-}
 
 const aboutSection = document.querySelector("#about");
 aboutSection.innerHTML = `
@@ -1151,11 +971,23 @@ const projectColumns = [
   projectsSection.columns.status,
 ];
 
-document.querySelector('[data-slot="project-columns"]').innerHTML =
+const projectColumnsElement = document.querySelector(
+  '[data-slot="project-columns"]',
+);
+const projectsComingSoon = document.querySelector(
+  '[data-slot="projects-coming-soon"]',
+);
+const projectList = document.querySelector('[data-slot="project-list"]');
+const hasProjects = projectsSection.items.length > 0;
+projectColumnsElement.hidden = !hasProjects;
+projectsComingSoon.hidden = hasProjects;
+projectsComingSoon.querySelector("span").textContent =
+  projectsSection.comingSoon;
+projectList.hidden = !hasProjects;
+projectColumnsElement.innerHTML =
   `<span aria-hidden="true">#</span>` +
   projectColumns.map((column) => `<span>${column}</span>`).join("");
 
-const projectList = document.querySelector('[data-slot="project-list"]');
 function statValueMarkup(value, label) {
   const numericValue = Number(value);
   if (value !== "" && Number.isFinite(numericValue)) {
@@ -1293,9 +1125,6 @@ skillTags.forEach((tag) => {
 
 let counterObserver;
 const counterFrames = new Map();
-let clockTimer = 0;
-let uptimeSeconds = 0;
-let headerVisible = true;
 let monitorStaticSampleTaken = false;
 
 function getNavigationLoadTime() {
@@ -1446,29 +1275,6 @@ function startMonitorUpdates() {
   monitorFrame = window.requestAnimationFrame(tick);
 }
 
-function updateUptime() {
-  uptimeSeconds += 1;
-  const hours = String(Math.floor(uptimeSeconds / 3600)).padStart(2, "0");
-  const minutes = String(Math.floor((uptimeSeconds % 3600) / 60)).padStart(2, "0");
-  const seconds = String(uptimeSeconds % 60).padStart(2, "0");
-  document.querySelector('[data-slot="uptime"]').textContent =
-    `${hours}:${minutes}:${seconds}`;
-}
-
-function startStatusUpdates() {
-  window.clearInterval(clockTimer);
-  if (reduceMotionQuery.matches || document.hidden || !headerVisible) return;
-  clockTimer = window.setInterval(() => {
-    updateLocalTime();
-    updateUptime();
-  }, 1000);
-}
-
-function stopLiveUpdates() {
-  stopMonitorUpdates();
-  window.clearInterval(clockTimer);
-}
-
 function renderCounterValue(element, value) {
   const suffix = element.dataset.countSuffix || "";
   element.textContent = `${value}${suffix}`;
@@ -1556,11 +1362,7 @@ document.querySelector(
 document.querySelector('[data-slot="contact-description"]').textContent =
   contact.description;
 const formContainer = document.querySelector('[data-slot="contact-form"]');
-const web3FormsAccessKey = data.settings.web3FormsAccessKey;
-const hasWeb3FormsKey =
-  typeof web3FormsAccessKey === "string" &&
-  Boolean(web3FormsAccessKey.trim()) &&
-  web3FormsAccessKey !== "YOUR_WEB3FORMS_ACCESS_KEY";
+const contactFormEnabled = false;
 const draftStorageKey = "portfolio-contact-draft";
 const contactFieldIds = ["contact-name", "contact-email", "contact-message"];
 const contactFields = new Map();
@@ -1628,6 +1430,43 @@ localTime.setAttribute("aria-live", "off");
 localTime.textContent = formatContactTime();
 locationContent.append(localTimeLabel, localTime);
 contactChannels.append(locationRow);
+
+const socialList = document.querySelector('[data-slot="contact-socials"]');
+socialList.setAttribute("aria-label", contact.socialLabel);
+socialList.hidden = false;
+(contact.socials || []).forEach((social) => {
+  const href = typeof social.href === "string" ? social.href.trim() : "";
+  let validHref = "";
+  try {
+    if (href && href !== "#" && new URL(href).protocol === "https:") {
+      validHref = href;
+    }
+  } catch {
+    validHref = "";
+  }
+
+  const item = document.createElement("li");
+  const element = document.createElement(validHref ? "a" : "span");
+  element.className = validHref
+    ? "contact-social-link"
+    : "contact-social-placeholder";
+  element.setAttribute(
+    "aria-label",
+    validHref ? `${social.name}, ${contact.form.opensNewTab}` : social.name,
+  );
+  if (validHref) {
+    element.href = validHref;
+    element.target = "_blank";
+    element.rel = "noopener noreferrer";
+  }
+  element.append(createContactIcon(social.icon));
+  const name = document.createElement("span");
+  name.className = "contact-social-name";
+  name.textContent = social.name;
+  element.append(name);
+  item.append(element);
+  socialList.append(item);
+});
 
 const available = document.querySelector(
   '[data-slot="contact-availability"]',
@@ -1828,12 +1667,11 @@ function renderContactForm() {
     <div class="contact-form-card">
       <div class="contact-form-header">
         <p class="contact-form-title">${contact.form.cardTitle}</p>
-        <span class="contact-form-connection" data-connection-state="${hasWeb3FormsKey ? "ready" : "disabled"}">
-          <i aria-hidden="true"></i>${hasWeb3FormsKey ? contact.form.ready : contact.form.disabled}
+        <span class="contact-form-connection" data-connection-state="disabled">
+          <i aria-hidden="true"></i>${contact.form.disabled}
         </span>
       </div>
-      <form class="contact-form" action="https://api.web3forms.com/submit" method="POST" novalidate>
-        <input type="hidden" name="access_key" value="${web3FormsAccessKey}">
+      <form class="contact-form" novalidate>
         <div class="contact-honeypot" aria-hidden="true">
           <label for="contact-botcheck">${contact.form.honeypotLabel}</label>
           <input id="contact-botcheck" name="botcheck" type="checkbox" tabindex="-1" autocomplete="off">
@@ -1866,13 +1704,9 @@ function renderContactForm() {
           <svg class="icon" aria-hidden="true"><use href="assets/icons.svg#alert"></use></svg>
           <span>${contact.form.errorSummary}</span>
         </p>
-        <button class="contact-submit" type="submit" ${hasWeb3FormsKey ? "" : 'disabled aria-describedby="contact-setup"'}>
+        <button class="contact-submit" type="submit" disabled>
           <span>${contact.form.submit}</span>
         </button>
-        <p class="contact-setup" id="contact-setup" role="status" ${hasWeb3FormsKey ? "hidden" : ""}>
-          <svg class="icon" aria-hidden="true"><use href="assets/icons.svg#warning"></use></svg>
-          <span>${contact.form.setup}</span>
-        </p>
       </form>
     </div>
   `;
@@ -1928,7 +1762,7 @@ function showContactFailure(form, error) {
 }
 
 async function sendContactMessage(form) {
-  if (contactSending || !hasWeb3FormsKey) return;
+  if (contactSending || !contactFormEnabled) return;
   submitAttempted = true;
   form.dataset.state = "";
   const errorSummary = form.querySelector(".contact-error-summary");
@@ -2070,21 +1904,6 @@ document.querySelectorAll(".site-main > section").forEach((section) => {
   section.insertAdjacentHTML("beforeend", createRuler());
 });
 
-const clock = document.querySelector('[data-slot="time"]');
-
-function updateLocalTime() {
-  const now = new Date();
-  clock.dateTime = now.toISOString();
-  clock.textContent = new Intl.DateTimeFormat(locale, {
-    hour: "2-digit",
-    minute: "2-digit",
-    second: "2-digit",
-    timeZone: data.timeZone,
-  }).format(now);
-}
-
-updateLocalTime();
-
 const revealElements = document.querySelectorAll(
   ".hero-copy, .profile-spec, .section-heading, .about-copy, .skill-matrix, .skill-table, .trainer-card, .project-list, .contact-layout",
 );
@@ -2104,7 +1923,7 @@ function resumeArchitectureFlow() {
 }
 
 function setFinalMotionState() {
-  stopLiveUpdates();
+  stopMonitorUpdates();
   counterFrames.forEach((frame) => window.cancelAnimationFrame(frame));
   counterFrames.clear();
   document
@@ -2149,26 +1968,18 @@ function initializeDrawingsAndCounters() {
     const liveObserver = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
-          if (entry.target.matches(".status-bar")) {
-            headerVisible = entry.isIntersecting;
-            document
-              .querySelector(".site-header")
-              .classList.toggle("is-visible", headerVisible);
-            startStatusUpdates();
-          } else if (entry.target.matches(".terminal-block")) {
+          if (entry.target.matches(".terminal-block")) {
             entry.target.classList.toggle("is-visible", entry.isIntersecting);
             monitorViewportVisible = entry.isIntersecting;
             startMonitorUpdates();
-          } else if (entry.target.matches(".now-panel")) {
-            entry.target.classList.toggle("is-visible", entry.isIntersecting);
           }
         });
       },
       { threshold: 0.05 },
     );
     document
-    .querySelectorAll(".status-bar, .terminal-block, .now-panel")
-    .forEach((target) => liveObserver.observe(target));
+      .querySelectorAll(".terminal-block")
+      .forEach((target) => liveObserver.observe(target));
   }
 
   if (!("IntersectionObserver" in window)) {
@@ -2246,26 +2057,23 @@ reduceMotionQuery.addEventListener("change", (event) => {
     setFinalMotionState();
     startMonitorUpdates();
   } else {
-    startStatusUpdates();
     startMonitorUpdates();
     resumeArchitectureFlow();
   }
 });
 
 initializeDrawingsAndCounters();
-startStatusUpdates();
 startMonitorUpdates();
 
 document.addEventListener("visibilitychange", () => {
   if (document.hidden) {
     document.body.classList.add("page-hidden");
-    stopLiveUpdates();
+    stopMonitorUpdates();
     pauseArchitectureFlow();
     return;
   }
 
   document.body.classList.remove("page-hidden");
-  startStatusUpdates();
   startMonitorUpdates();
   resumeArchitectureFlow();
 });
