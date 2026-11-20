@@ -1,0 +1,385 @@
+/* Global layout, shared structure, and foundational components */
+* {
+  box-sizing: border-box;
+}
+
+.contact-error-summary {
+  flex-wrap: wrap;
+}
+
+.contact-error-summary > span {
+  flex: 1 1 180px;
+}
+
+html {
+  min-width: 320px;
+  background: var(--color-bg);
+  scroll-behavior: smooth;
+}
+
+body {
+  min-width: 320px;
+  margin: 0;
+  background: var(--color-bg);
+  color: var(--color-text);
+  font-family: var(--font-sans);
+  line-height: 1.6;
+  transition:
+    background-color var(--motion-theme) ease,
+    color var(--motion-theme) ease;
+}
+
+button,
+a {
+  color: inherit;
+  font: inherit;
+}
+
+a {
+  text-decoration-color: var(--color-border);
+  text-underline-offset: 0.2em;
+}
+
+a:hover {
+  color: var(--color-accent);
+  text-decoration-color: currentColor;
+}
+
+:focus-visible {
+  outline: 2px solid var(--color-focus);
+  outline-offset: 4px;
+}
+
+.skip-link {
+  position: fixed;
+  z-index: 10;
+  inset-block-start: var(--space-2);
+  inset-inline-start: var(--space-2);
+  padding: var(--space-2) var(--space-4);
+  transform: translateY(-160%);
+  background: var(--color-bg);
+  color: var(--color-text);
+  border: var(--line);
+}
+
+.skip-link:focus {
+  transform: translateY(0);
+}
+
+.site-shell {
+  width: min(100% - var(--page-gutter) * 2, var(--content-max));
+  margin-inline: auto;
+}
+
+.page-grid {
+  position: relative;
+  isolation: isolate;
+}
+
+.grid-mark {
+  position: absolute;
+  z-index: 1;
+  color: var(--color-muted);
+  font: 400 0.7rem/1 var(--font-mono);
+  pointer-events: none;
+}
+
+.grid-mark--top-start {
+  inset-block-start: 0;
+  inset-inline-start: 0;
+}
+
+.grid-mark--top-end {
+  inset-block-start: 0;
+  inset-inline-end: 0;
+}
+
+.grid-mark--bottom-start {
+  inset-block-end: 0;
+  inset-inline-start: 0;
+}
+
+.grid-mark--bottom-end {
+  inset-block-end: 0;
+  inset-inline-end: 0;
+}
+
+.grid-overlay {
+  position: absolute;
+  inset-block: 0;
+  inset-inline: 0;
+  z-index: -1;
+  display: grid;
+  grid-template-columns: repeat(var(--grid-columns), minmax(0, 1fr));
+  column-gap: var(--grid-gap);
+  pointer-events: none;
+}
+
+.grid-overlay span {
+  border-inline-start: 1px solid var(--color-border);
+  opacity: 0.42;
+}
+
+.grid-overlay span:nth-child(n + 5) {
+  display: none;
+}
+
+.grid-overlay span:nth-child(4) {
+  border-inline-end: 1px solid var(--color-border);
+}
+
+.site-header,
+.site-footer {
+  border-block-end: var(--line);
+}
+
+.site-footer {
+  border-block-start: var(--line);
+  border-block-end: 0;
+  display: flex;
+  justify-content: space-between;
+  gap: var(--space-4);
+  padding-block: var(--space-4);
+  color: var(--color-muted);
+  font: 400 0.65rem/1.5 var(--font-mono);
+}
+
+.site-main > section {
+  min-width: 0;
+  border-block-end: var(--line);
+}
+
+.reveal {
+  opacity: 0;
+  transform: translateY(8px);
+  transition: opacity 200ms ease-out, transform 200ms ease-out;
+}
+
+.reveal.is-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.section-heading {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--space-2);
+  padding-block: var(--space-12) var(--space-6);
+}
+
+.section-index {
+  margin: 0;
+  color: var(--color-muted);
+  font: 500 0.72rem/1.5 var(--font-mono);
+  letter-spacing: 0.06em;
+}
+
+.section-title {
+  max-width: 24ch;
+  margin: 0;
+  font: 500 clamp(1.45rem, 3.2vw, 2.4rem)/1.25 var(--font-mono);
+  letter-spacing: -0.045em;
+}
+
+.section-index-reveal {
+  color: var(--color-accent);
+}
+
+.section-ruler {
+  display: block;
+  width: 100%;
+  height: 12px;
+  margin-block-start: var(--space-6);
+  overflow: visible;
+}
+
+.ruler-track {
+  fill: none;
+  stroke: var(--color-border);
+  stroke-width: 1;
+}
+
+.about-copy {
+  max-width: 68ch;
+  padding-block-end: var(--space-12);
+  color: var(--color-muted);
+  font-size: clamp(1rem, 1.6vw, 1.125rem);
+}
+
+.about-copy p {
+  margin: 0;
+}
+
+.about-copy p + p {
+  margin-block-start: var(--space-4);
+}
+
+.circuit-figure {
+  width: min(100%, 480px);
+  height: auto;
+  aspect-ratio: 20 / 3;
+  margin: 0 0 var(--space-8);
+}
+
+.circuit-diagram {
+  display: block;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+.circuit-track,
+.diagram-box,
+.diagram-node,
+.diagram-link {
+  fill: none;
+  stroke: var(--color-border);
+  stroke-width: 1;
+  stroke-linecap: square;
+  stroke-linejoin: miter;
+}
+
+.circuit-node,
+.diagram-accent {
+  fill: var(--color-bg);
+  stroke: var(--color-muted);
+  stroke-width: 1;
+}
+
+.circuit-accent {
+  fill: var(--color-accent);
+}
+
+.diagram-accent {
+  fill: var(--color-accent);
+  stroke: var(--color-accent);
+}
+
+.architecture-figure {
+  width: min(100%, 320px);
+  height: auto;
+  aspect-ratio: 360 / 318;
+  margin: var(--space-6) 0 0;
+}
+
+.architecture-diagram {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.diagram-label {
+  fill: var(--color-muted);
+  font: 10px var(--font-mono);
+  opacity: 0;
+  transition: opacity 180ms ease-out;
+}
+
+.architecture-figure.labels-visible .diagram-label {
+  opacity: 1;
+  transition-delay: 140ms;
+}
+
+.architecture-figure.labels-visible .diagram-accent,
+.circuit-figure.labels-visible .circuit-node {
+  opacity: 1;
+  transition: opacity 180ms ease-out 160ms;
+}
+
+.diagram-accent,
+.circuit-node {
+  opacity: 0;
+}
+
+.terminal-block {
+  min-height: 132px;
+  margin-block-end: var(--space-6);
+  border-block: var(--line);
+  padding-block: var(--space-3);
+  font: 400 0.68rem/1.6 var(--font-mono);
+}
+
+.terminal-heading {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin: 0 0 var(--space-2);
+  color: var(--color-muted);
+  font-size: 0.62rem;
+}
+
+.terminal-output p {
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+
+.terminal-command {
+  color: var(--color-text);
+}
+
+.terminal-result {
+  padding-inline-start: var(--space-4);
+  color: var(--color-muted);
+}
+
+.terminal-cursor {
+  display: inline-block;
+  color: var(--color-accent);
+  animation: cursor-blink 1s steps(2, start) infinite;
+}
+
+.metric-strip {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-8);
+  padding-block: var(--space-4) var(--space-8);
+  border-block-start: var(--line);
+}
+
+.metric-item {
+  display: grid;
+  gap: var(--space-1);
+}
+
+.metric-value {
+  color: var(--color-accent);
+  font: 500 1.4rem/1.2 var(--font-mono);
+  font-variant-numeric: tabular-nums;
+}
+
+.metric-label {
+  color: var(--color-muted);
+  font: 400 0.62rem/1.5 var(--font-mono);
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.draw-path {
+  stroke-dasharray: var(--path-length, 1000);
+  stroke-dashoffset: var(--path-length, 1000);
+  transition: stroke-dashoffset 700ms ease-out;
+}
+
+.draw-path.is-drawn {
+  stroke-dashoffset: 0;
+}
+
+.metric-value,
+.counter-value {
+  font-variant-numeric: tabular-nums;
+}
+
+.reveal {
+  transition-delay: var(--reveal-delay, 0ms);
+}
+

@@ -1,0 +1,145 @@
+/* Responsive and reduced-motion overrides */
+@media (min-width: 1024px) {
+  .contact-layout {
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+    gap: var(--grid-gap);
+    align-items: start;
+    margin-inline: 0;
+    padding-inline: 0;
+    padding-block-end: var(--space-24);
+  }
+
+  .contact-layout > .contact-intro {
+    grid-column: span 5;
+  }
+
+  .contact-layout > div[data-slot="contact-form"] {
+    grid-column: span 7;
+  }
+}
+
+@media (min-width: 640px) {
+  .contact-form {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 768px) and (max-width: 1023px) {
+  .contact-layout {
+    max-inline-size: 720px;
+    margin-inline: auto;
+  }
+}
+
+@media (max-width: 639px) {
+  .contact-form {
+    padding: var(--space-5);
+  }
+
+  .contact-success {
+    padding: var(--space-5);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .contact-availability .availability-indicator {
+    animation: none;
+  }
+
+  .contact-spinner {
+    display: none;
+  }
+}
+
+@media (max-width: 700px) {
+  .contact-socials {
+    display: flex;
+    justify-content: center;
+    gap: var(--space-2);
+  }
+
+  .contact-socials > li {
+    flex: 0 0 31%;
+    min-width: 0;
+  }
+
+  .contact-social-link,
+  .contact-social-placeholder {
+    width: 100%;
+    min-width: 0;
+    min-height: 64px;
+    flex-direction: column;
+    gap: var(--space-1);
+    padding: var(--space-2) var(--space-1);
+  }
+
+  .contact-social-name {
+    max-width: 100%;
+    overflow-wrap: anywhere;
+    text-align: center;
+    font-size: 0.62rem;
+  }
+
+  .status-bar {
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--space-2) var(--space-3);
+    min-height: 0;
+    padding-block: var(--space-3);
+  }
+
+  .status-name {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .status-location {
+    grid-column: 1;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .header-tools {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0;
+    padding-block: var(--space-2);
+  }
+
+  .site-navigation {
+    justify-content: flex-start;
+    gap: var(--space-4);
+    overflow-x: auto;
+    padding-block: var(--space-1) var(--space-2);
+    font-size: 0.75rem;
+    scrollbar-width: thin;
+  }
+
+  .header-controls {
+    justify-content: flex-end;
+    gap: var(--space-2);
+    padding-block-start: var(--space-2);
+    border-block-start: var(--line);
+  }
+
+  .project-detail-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .project-preview {
+    min-height: 150px;
+  }
+
+  .project-facts {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+@media (max-width: 340px) {
+  .contact-layout {
+    margin-inline: calc(-1 * var(--space-4));
+  }
+}

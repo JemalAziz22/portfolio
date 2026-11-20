@@ -11,8 +11,16 @@ assets/
   noise.svg
   profile.png
 css/
-  styles.css
   tokens.css
+  styles.css (ordered stylesheet manifest)
+  global-layout.css
+  skills-projects.css
+  contact.css
+  header-hero.css
+  section-layout.css
+  motion-layout-overrides.css
+  terminal-project-overrides.css
+  responsive-overrides.css
 data/
   data.js
 js/
@@ -42,7 +50,7 @@ Edit `data/data.js`; the HTML structure and CSS do not need content changes.
 
 ## Design and preferences
 
-Change color, typography, spacing, and responsive grid tokens in `css/tokens.css`. The theme toggle follows the operating-system preference until a visitor chooses a theme, then stores that choice in `localStorage`.
+Change color, typography, spacing, and responsive grid tokens in `css/tokens.css`. Component styles are split into ordered files under `css/`; `css/styles.css` imports them in cascade order. Keep the imports in that order. The theme toggle follows the operating-system preference until a visitor chooses a theme, then stores that choice in `localStorage`.
 
 ## Deployment
 

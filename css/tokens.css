@@ -10,6 +10,11 @@
   --color-muted: #9cafb5;
   --color-dim: #82969d;
   --color-accent: #6dd3c5;
+  --color-vibrant: #22d3ee;
+  --color-warm: #ff8a65;
+  --color-signal: #facc15;
+  --gradient-vibrant: linear-gradient(135deg, var(--color-accent), var(--color-vibrant), var(--color-warm));
+  --glow-vibrant: 0 0 24px color-mix(in srgb, var(--color-vibrant) 28%, transparent);
   --color-data: #8cb9cf;
   --color-status: #34d399;
   --color-danger: #fb7185;
@@ -60,6 +65,12 @@
   --color-muted: #485b58;
   --color-dim: #566966;
   --color-accent: #0b756b;
+  --color-vibrant: #0891b2;
+  --color-warm: #d85a3a;
+  --color-signal: #a16207;
+  --color-vibrant: #0891b2;
+  --color-warm: #d85a3a;
+  --color-signal: #a16207;
   --color-data: #346d65;
   --color-status: #087a51;
   --color-danger: #b42345;
